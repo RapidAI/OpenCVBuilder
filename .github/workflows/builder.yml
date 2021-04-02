@@ -1,0 +1,105 @@
+name: OpenCV Builder
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    env:
+      OPENCV_VERSION: 4.5.1
+      PKG_NAME: opencv-4.5.1-macos
+
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v2
+
+      # 检出opencv
+      - name: checkout opencv
+        uses: actions/checkout@v2
+        with:
+          repository: opencv/opencv
+          path: opencv-${{ env.OPENCV_VERSION }}
+          ref: ${{ env.OPENCV_VERSION }}
+          submodules: recursive
+
+      # 安装openmp
+      - name: install openmp
+        run: |
+          brew install libomp
+
+      # 复制编译脚本
+      - name: copy build script
+        run: |
+          cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
+          cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+
+      # 编译opencv4 for macos
+      - name: build opencv
+        run: |
+          cd opencv-${{ env.OPENCV_VERSION }}
+          chmod a+x build-opencv4.sh &&./build-opencv4.sh
+
+      # install文件夹改名macos，并使用7z压缩
+      - name: 7zip
+        run: |
+          cd opencv-${{ env.OPENCV_VERSION }}/build-Release
+          mv install macos
+          7z a ${{ env.PKG_NAME }}.7z macos
+
+      # 上传artifact
+      - name: upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: opencv-${{ env.OPENCV_VERSION }}/build-Release/${{ env.PKG_NAME }}.7z
+
+  build-ubuntu1604:
+    runs-on: ubuntu-16.04
+
+    env:
+      OPENCV_VERSION: 4.5.1
+      PKG_NAME: opencv-4.5.1-ubuntu1604
+
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v2
+
+      # 检出opencv
+      - name: checkout opencv
+        uses: actions/checkout@v2
+        with:
+          repository: opencv/opencv
+          path: opencv-${{ env.OPENCV_VERSION }}
+          ref: ${{ env.OPENCV_VERSION }}
+          submodules: recursive
+
+      # 复制编译脚本
+      - name: copy build script
+        run: |
+          cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
+          cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+
+      # 编译opencv4 for ubuntu
+      - name: build opencv
+        run: |
+          cd opencv-${{ env.OPENCV_VERSION }}
+          chmod a+x build-opencv4.sh &&./build-opencv4.sh
+
+      # install文件夹改名linux，并使用7z压缩
+      - name: 7zip
+        run: |
+          cd opencv-${{ env.OPENCV_VERSION }}/build-Release
+          mv install linux
+          7z a ${{ env.PKG_NAME }}.7z linux
+
+      # 上传artifact
+      - name: upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: opencv-${{ env.OPENCV_VERSION }}/build-Release/${{ env.PKG_NAME }}.7z
