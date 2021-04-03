@@ -10,10 +10,7 @@ for /f "Delims=" %%x in (opencv4_cmake_options.txt) do set OPTIONS=!OPTIONS!%%x
 ::call :cmakeParams "Visual Studio 14 2015" "v140" "Win32"
 
 call :cmakeParams "Visual Studio 15 2017" "v141" "x64"
-::call :cmakeParams "Visual Studio 15 2017" "v141" "Win32"
-
-::call :cmakeParams "Visual Studio 16 2019" "v142" "x64"
-::call :cmakeParams "Visual Studio 16 2019" "v142" "Win32"
+call :cmakeParams "Visual Studio 15 2017" "v141" "Win32"
 GOTO:EOF
 
 :cmakeParams
