@@ -1,11 +1,72 @@
 # OpenCVBuilder
+
 OpenCV Custom Builder
 
-### 说明
-OpenCV在Ocr中只是做图像的读取保存、编解码、缩放等，可以去除大部分功能模块，保留几个核心功能模块即可。
+### 介绍
+
+OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以去除大部分功能模块，保留几个核心功能模块即可。
 
 在[opencv-mobile](https://github.com/nihui/opencv-mobile) 的基础上进行修改，并保留imgcodecs模块。
 
 [模块定制说明](https://docs.opencv.org/4.5.0/db/d05/tutorial_config_reference.html)
 
 最后利用Github Actions进行编译。
+
+### 手动编译说明
+
+如果您的系统太新或太旧无法直接使用本仓库编译的包，请尝试手动编译。
+
+#### Linux编译说明
+
+1. 编译环境:
+
+| 操作系统 | 基本软件包 |
+| ------- | ------- |
+| Ubuntu16.04 | [基本软件包](https://github.com/actions/virtual-environments/blob/ubuntu16/20210327.1/images/linux/Ubuntu1604-README.md) |
+
+sudo apt-get install build-essential cmake
+
+2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
+
+3. 复制[编译脚本](build-opencv4.sh)和[cmake选项](opencv4_cmake_options.txt)
+   到opencv文件夹，并执行```chmod a+x build-opencv4.sh &&./build-opencv4.sh```
+   编译结果在：opencv/build-Release/install
+
+#### macOS编译说明
+
+1. 编译环境:
+
+| 操作系统 | 基本软件包 |
+| ------- | ------- |
+| macos10.15 | [基本软件包](https://github.com/actions/virtual-environments/blob/macOS-10.15/20210327.1/images/macos/macos-10.15-Readme.md) |
+
+Xcode Command Line Tools >= 12
+
+下载安装HomeBrew
+
+```brew install cmake libomp```
+
+2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
+
+3. 复制[编译脚本](build-opencv4.sh)和[cmake选项](opencv4_cmake_options.txt)
+   到opencv文件夹，并执行```chmod a+x build-opencv4.sh &&./build-opencv4.sh```
+   编译结果在：opencv/build-Release/install
+
+#### windows编译说明
+
+1. 编译环境:
+
+| 操作系统 | 基本软件包 |
+| ------- | ------- |
+| Windows-vs2017 | [基本软件包](https://github.com/actions/virtual-environments/blob/win16/20210329.1/images/win/Windows2016-Readme.md) |
+| Windows-vs2019 | [基本软件包](https://github.com/actions/virtual-environments/blob/win19/20210316.1/images/win/Windows2019-Readme.md) |
+
+2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
+
+3. 复制编译脚本和cmake选项
+
+vs2017环境，复制[编译脚本vs2017](build-opencv4-vs2017.bat)和[cmake选项](opencv4_cmake_options.txt)到opencv文件夹
+
+vs2019环境，复制[编译脚本vs2019](build-opencv4-vs2019.bat)和[cmake选项](opencv4_cmake_options.txt)到opencv文件夹
+
+4. 运行对应的编译脚本，编译结果在：opencv/build-xxx-xxx/install
