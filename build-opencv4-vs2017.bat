@@ -16,7 +16,7 @@ GOTO:EOF
 :cmakeParams
 mkdir "build-%~2-%~3"
 pushd "build-%~2-%~3"
-cmake -G "%~1" -T "%~2,host=x64" -A "%~3" ^
+cmake -G "%~1" -T "%~2,host=x64" -A "%~3" -DCMAKE_INSTALL_PREFIX=install ^
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_CONFIGURATION_TYPES=Release ^
   %OPTIONS% ^
   ..
