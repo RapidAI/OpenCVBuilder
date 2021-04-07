@@ -10,10 +10,11 @@ function cmakeParamsMac() {
     -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" \
     -DOpenMP_CXX_LIB_NAMES="omp" \
     -DOpenMP_C_LIB_NAMES="omp" \
+    -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib \
     $(cat ../opencv4_cmake_options.txt) \
     ..
-  cmake --build . -j $NUM_THREADS
-  cmake --build . --target install
+  cmake --build . --config $1 -j $NUM_THREADS
+  cmake --build . --config $1 --target install
   popd
 }
 
@@ -24,8 +25,8 @@ function cmakeParamsLinux() {
     -DCMAKE_INSTALL_PREFIX=install \
     $(cat ../opencv4_cmake_options.txt) \
     ..
-  cmake --build . -j $NUM_THREADS
-  cmake --build . --target install
+  cmake --build . --config $1 -j $NUM_THREADS
+  cmake --build . --config $1 --target install
   popd
 }
 

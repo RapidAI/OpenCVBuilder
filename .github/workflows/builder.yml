@@ -239,12 +239,7 @@ jobs:
       # 查看artifact
       - name: list artifact
         run: |
-          ls artifacts
           tree artifacts
-          ls artifacts/opencv-4.5.1-macos1015
-          ls artifacts/opencv-4.5.1-ubuntu1604
-          ls artifacts/opencv-4.5.1-windows-vs2017
-          ls artifacts/opencv-4.5.1-windows-vs2019
 
       # 创建release
       - name: create-release
