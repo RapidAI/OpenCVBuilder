@@ -24,7 +24,11 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 | ------- | ------- |
 | Ubuntu16.04 | [基本软件包](https://github.com/actions/virtual-environments/blob/ubuntu16/20210327.1/images/linux/Ubuntu1604-README.md) |
 
+安装build-essential和cmake
+
+```shell
 sudo apt-get install build-essential cmake
+```
 
 2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
 
@@ -40,11 +44,20 @@ sudo apt-get install build-essential cmake
 | ------- | ------- |
 | macos10.15 | [基本软件包](https://github.com/actions/virtual-environments/blob/macOS-10.15/20210327.1/images/macos/macos-10.15-Readme.md) |
 
-Xcode Command Line Tools >= 12
+安装[Xcode](https://developer.apple.com/download/more) > 12
 
-下载安装HomeBrew
+安装[HomeBrew](https://brew.sh/)
 
+安装libomp
 ```brew install cmake libomp```
+
+安装CommandLineTools
+
+```shell
+brew doctor
+sudo rm -rf /Library/Developer/CommandLineTools
+sudo xcode-select --install
+```
 
 2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
 
@@ -61,6 +74,10 @@ Xcode Command Line Tools >= 12
 | Windows-vs2017 | [基本软件包](https://github.com/actions/virtual-environments/blob/win16/20210329.1/images/win/Windows2016-Readme.md) |
 | Windows-vs2019 | [基本软件包](https://github.com/actions/virtual-environments/blob/win19/20210316.1/images/win/Windows2019-Readme.md) |
 
+安装vs2017或者vs2019，并选中"C++桌面开发"
+
+安装[cmake](https://cmake.org/download/)
+
 2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
 
 3. 复制编译脚本和cmake选项
@@ -69,4 +86,5 @@ vs2017环境，复制[编译脚本vs2017](build-opencv4-vs2017.bat)和[cmake选�
 
 vs2019环境，复制[编译脚本vs2019](build-opencv4-vs2019.bat)和[cmake选项](opencv4_cmake_options.txt)到opencv文件夹
 
-4. 运行对应的编译脚本，编译结果在：opencv/build-xxx-xxx/install
+4. 开始菜单打开"x64 Native Tools Command Prompt for VS 2019"或"适用于 VS2017 的 x64 本机工具"，
+   运行对应的编译脚本，编译结果在：opencv/build-xxx-xxx/install
