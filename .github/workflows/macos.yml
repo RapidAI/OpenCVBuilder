@@ -8,8 +8,8 @@ jobs:
     runs-on: macos-latest
 
     env:
-      OPENCV_VERSION: 4.5.1
-      PKG_NAME: opencv-4.5.1-macos1015
+      OPENCV_VERSION: 4.5.2
+      PKG_NAME: opencv-4.5.2-macos1015
 
     steps:
       # 检出代码
