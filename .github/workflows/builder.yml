@@ -280,7 +280,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.5.1-windows-vs2017
+          PKG_NAME: opencv-4.5.3-windows-vs2017
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
