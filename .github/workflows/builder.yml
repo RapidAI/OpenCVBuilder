@@ -217,10 +217,11 @@ jobs:
       - name: Get git log
         id: git-log
         run: |
-          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-          lastTag=$(git describe --abbrev=0 --tags)
-          echo "previousTag:$previousTag ~ lastTag:$lastTag"
-          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+      #    previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+      #    lastTag=$(git describe --abbrev=0 --tags)
+      #    echo "previousTag:$previousTag ~ lastTag:$lastTag"
+      #    log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+          log='no log'
           echo "$log"
           echo "::set-output name=log::"$log""
 
