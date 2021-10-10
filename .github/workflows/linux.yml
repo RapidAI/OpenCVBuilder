@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-16.04
 
     env:
-      OPENCV_VERSION: 4.5.3
-      PKG_NAME: opencv-4.5.3-ubuntu1604
+      OPENCV_VERSION: 4.5.4
+      PKG_NAME: opencv-4.5.4-ubuntu1604
 
     steps:
       # 检出代码
