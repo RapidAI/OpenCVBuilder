@@ -8,8 +8,8 @@ jobs:
     runs-on: windows-2019
 
     env:
-      OPENCV_VERSION: 4.5.3
-      PKG_NAME: opencv-4.5.3-windows-vs2019
+      OPENCV_VERSION: 4.5.4
+      PKG_NAME: opencv-4.5.4-windows-vs2019
 
     steps:
       # 检出代码
