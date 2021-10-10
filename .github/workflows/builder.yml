@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-16.04
 
     env:
-      OPENCV_VERSION: 4.5.3
-      PKG_NAME: opencv-4.5.3-ubuntu1604
+      OPENCV_VERSION: 4.5.4
+      PKG_NAME: opencv-4.5.4-ubuntu1604
 
     steps:
       # 检出代码
@@ -56,8 +56,8 @@ jobs:
     runs-on: macos-latest
 
     env:
-      OPENCV_VERSION: 4.5.3
-      PKG_NAME: opencv-4.5.3-macos1015
+      OPENCV_VERSION: 4.5.4
+      PKG_NAME: opencv-4.5.4-macos1015
 
     steps:
       # 检出代码
@@ -106,8 +106,8 @@ jobs:
     runs-on: windows-2016
 
     env:
-      OPENCV_VERSION: 4.5.3
-      PKG_NAME: opencv-4.5.3-windows-vs2017
+      OPENCV_VERSION: 4.5.4
+      PKG_NAME: opencv-4.5.4-windows-vs2017
 
     steps:
       # 检出代码
@@ -155,8 +155,8 @@ jobs:
     runs-on: windows-2019
 
     env:
-      OPENCV_VERSION: 4.5.3
-      PKG_NAME: opencv-4.5.3-windows-vs2019
+      OPENCV_VERSION: 4.5.4
+      PKG_NAME: opencv-4.5.4-windows-vs2019
 
     steps:
       # 检出代码
@@ -258,7 +258,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.5.3-ubuntu1604
+          PKG_NAME: opencv-4.5.4-ubuntu1604
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
@@ -269,7 +269,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.5.3-macos1015
+          PKG_NAME: opencv-4.5.4-macos1015
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
@@ -280,7 +280,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.5.3-windows-vs2017
+          PKG_NAME: opencv-4.5.4-windows-vs2017
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
@@ -291,7 +291,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.5.3-windows-vs2019
+          PKG_NAME: opencv-4.5.4-windows-vs2019
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
