@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  ubuntu1604:
-    runs-on: ubuntu-16.04
+  ubuntu1804:
+    runs-on: ubuntu-18.04
 
     env:
       OPENCV_VERSION: 4.5.4
-      PKG_NAME: opencv-4.5.4-ubuntu1604
+      PKG_NAME: opencv-4.5.4-ubuntu1804
 
     steps:
       # 检出代码

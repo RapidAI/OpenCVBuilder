@@ -22,7 +22,7 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 | 操作系统 | 基本软件包 |
 | ------- | ------- |
-| Ubuntu16.04 | [基本软件包](https://github.com/actions/virtual-environments/blob/ubuntu16/20210327.1/images/linux/Ubuntu1604-README.md) |
+| Ubuntu18.04 | [基本软件包](https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md) |
 
 安装build-essential和cmake
 

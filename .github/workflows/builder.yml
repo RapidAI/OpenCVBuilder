@@ -7,12 +7,12 @@ on:
       - '*'
 
 jobs:
-  ubuntu1604:
-    runs-on: ubuntu-16.04
+  ubuntu1804:
+    runs-on: ubuntu-18.04
 
     env:
       OPENCV_VERSION: 4.5.4
-      PKG_NAME: opencv-4.5.4-ubuntu1604
+      PKG_NAME: opencv-4.5.4-ubuntu1804
 
     steps:
       # 检出代码
@@ -201,7 +201,7 @@ jobs:
             ${{ env.PKG_NAME }}.7z
 
   release:
-    needs: [ ubuntu1604, macos1015, windows-vs2017, windows-vs2019 ]
+    needs: [ ubuntu1804, macos1015, windows-vs2017, windows-vs2019 ]
 
     runs-on: ubuntu-latest
 
@@ -254,11 +254,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: upload-ubuntu1604
+      - name: upload-ubuntu1804
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.5.4-ubuntu1604
+          PKG_NAME: opencv-4.5.4-ubuntu1804
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
