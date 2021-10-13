@@ -6,12 +6,8 @@ function cmakeParamsMac() {
   pushd "build-$1"
   cmake -DCMAKE_BUILD_TYPE=$1 -DCMAKE_CONFIGURATION_TYPES=$1 \
     -DCMAKE_INSTALL_PREFIX=install \
-    -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" \
-    -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" \
-    -DOpenMP_CXX_LIB_NAMES="omp" \
-    -DOpenMP_C_LIB_NAMES="omp" \
-    -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib \
     $(cat ../opencv4_cmake_options.txt) \
+    -DWITH_OPENMP=OFF \
     ..
   cmake --build . --config $1 -j $NUM_THREADS
   cmake --build . --config $1 --target install
@@ -24,6 +20,7 @@ function cmakeParamsLinux() {
   cmake -DCMAKE_BUILD_TYPE=$1 -DCMAKE_CONFIGURATION_TYPES=$1 \
     -DCMAKE_INSTALL_PREFIX=install \
     $(cat ../opencv4_cmake_options.txt) \
+    -DWITH_OPENMP=ON \
     ..
   cmake --build . --config $1 -j $NUM_THREADS
   cmake --build . --config $1 --target install
