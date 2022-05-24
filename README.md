@@ -12,6 +12,9 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 最后利用Github Actions进行编译。
 
+### 20220524 update
+opencv 4.5.5 linux WITH_OPENMP=OFF
+
 ### 手动编译说明
 
 如果您的系统太新或太旧无法直接使用本仓库编译的包，请尝试手动编译。
