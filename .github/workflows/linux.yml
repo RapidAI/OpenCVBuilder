@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-18.04
 
     env:
-      OPENCV_VERSION: 4.5.5
-      PKG_NAME: opencv-4.5.5-ubuntu1804
+      OPENCV_VERSION: 4.6.0
+      PKG_NAME: opencv-4.6.0-ubuntu1804
 
     steps:
       # 检出代码

@@ -12,6 +12,9 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 最后利用Github Actions进行编译。
 
+### 20220614 update
+opencv 4.6.0
+
 ### 20220524 update
 opencv 4.5.5 不使用任何并行库
 

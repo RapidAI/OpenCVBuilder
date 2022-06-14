@@ -8,8 +8,8 @@ jobs:
     runs-on: windows-2016
 
     env:
-      OPENCV_VERSION: 4.5.5
-      PKG_NAME: opencv-4.5.5-windows-vs2017
+      OPENCV_VERSION: 4.6.0
+      PKG_NAME: opencv-4.6.0-windows-vs2017
 
     steps:
       # 检出代码

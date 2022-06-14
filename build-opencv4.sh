@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build opencv 4.5.x base on https://github.com/nihui/opencv-mobile/blob/master/opencv4_cmake_options.txt
+# build opencv 4.6.x base on https://github.com/nihui/opencv-mobile/blob/master/opencv4_cmake_options.txt
 
 function cmakeParams() {
   mkdir -p "build-$1"
