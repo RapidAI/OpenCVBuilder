@@ -12,11 +12,8 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 最后利用Github Actions进行编译。
 
-### 20220614 update
-opencv 4.6.0
-
-### 20220524 update
-opencv 4.5.5 不使用任何并行库
+### 关于Windows静态链接CRT
+编译选项添加BUILD_WITH_STATIC_CRT=ON
 
 ### 手动编译说明
 
@@ -93,4 +90,15 @@ vs2017环境，复制[编译脚本vs2017](build-opencv4-vs2017.bat)和[cmake选�
 vs2019环境，复制[编译脚本vs2019](build-opencv4-vs2019.bat)和[cmake选项](opencv4_cmake_options.txt)到opencv文件夹
 
 4. 开始菜单打开"x64 Native Tools Command Prompt for VS 2019"或"适用于 VS2017 的 x64 本机工具"，
-   运行对应的编译脚本，编译结果在：opencv/build-xxx-xxx/install
+   运行对应的编译脚本，编译结果在：opencv/build-xxx-xxx-xx/install，后缀md代表链接动态CRT，后缀mt代表链接静态CRT
+
+### 20220524 update
+opencv 4.5.5 不使用任何并行库
+
+### 20220614 update
+opencv 4.6.0
+
+### 20221013 update
+windows平台，更早版本的包均为md版，从此版增加链接静态CRT版本(mt)
+后缀md: BUILD_WITH_STATIC_CRT=OFF
+后缀mt: BUILD_WITH_STATIC_CRT=ON

@@ -39,16 +39,35 @@ jobs:
           ./build-opencv4-vs2017.bat
 
       # install文件夹改名，并使用7z压缩
-      - name: rename
+      - name: 7z-md
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64/install windows-x64
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32/install windows-x86
-          7z a ${{ env.PKG_NAME }}.7z windows-x64 windows-x86
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64-md/install windows-x64
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32-md/install windows-x86
+          7z a ${{ env.PKG_NAME }}-md.7z windows-x64 windows-x86
+          rm windows-x64 -r -fo
+          rm windows-x86 -r -fo
 
       # 上传artifact
-      - name: upload
+      - name: upload-md
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PKG_NAME }}
+          name: ${{ env.PKG_NAME }}-md
           path: |
-            ${{ env.PKG_NAME }}.7z
+            ${{ env.PKG_NAME }}-md.7z
+
+      # install文件夹改名，并使用7z压缩
+      - name: 7z-mt
+        run: |
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64-mt/install windows-x64
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32-mt/install windows-x86
+          7z a ${{ env.PKG_NAME }}-mt.7z windows-x64 windows-x86
+          rm windows-x64 -r -fo
+          rm windows-x86 -r -fo
+
+      # 上传artifact
+      - name: upload-mt
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}-mt
+          path: |
+            ${{ env.PKG_NAME }}-mt.7z
