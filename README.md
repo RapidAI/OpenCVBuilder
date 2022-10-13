@@ -99,6 +99,7 @@ opencv 4.5.5 不使用任何并行库
 opencv 4.6.0
 
 ### 20221013 update
+默认编译环境改为vs2019
 windows平台，更早版本的包均为md版，从此版增加链接静态CRT版本(mt)
 后缀md: BUILD_WITH_STATIC_CRT=OFF
 后缀mt: BUILD_WITH_STATIC_CRT=ON

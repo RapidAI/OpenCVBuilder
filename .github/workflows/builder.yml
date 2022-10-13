@@ -102,12 +102,12 @@ jobs:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_NAME }}.7z
 
-  windows-vs2017:
-    runs-on: windows-2016
+  windows-vs2019:
+    runs-on: windows-2019
 
     env:
       OPENCV_VERSION: 4.6.0
-      PKG_NAME: opencv-4.6.0-windows-vs2017
+      PKG_NAME: opencv-4.6.0-windows-vs2019
 
     steps:
       # 检出代码
@@ -125,7 +125,7 @@ jobs:
       # 复制编译脚本
       - name: copy build script
         run: |
-          cp build-opencv4-vs2017.bat opencv-${{ env.OPENCV_VERSION }}
+          cp build-opencv4-vs2019.bat opencv-${{ env.OPENCV_VERSION }}
           cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
 
       # 编译opencv for windows
@@ -134,13 +134,13 @@ jobs:
       - name: build opencv
         run: |
           cd opencv-${{ env.OPENCV_VERSION }}
-          ./build-opencv4-vs2017.bat
+          ./build-opencv4-vs2019.bat
 
       # install文件夹改名，并使用7z压缩
       - name: 7z-md
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64-md/install windows-x64
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32-md/install windows-x86
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-x64-md/install windows-x64
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-Win32-md/install windows-x86
           7z a ${{ env.PKG_NAME }}-md.7z windows-x64 windows-x86
           rm windows-x64 -r -fo
           rm windows-x86 -r -fo
@@ -156,8 +156,8 @@ jobs:
       # install文件夹改名，并使用7z压缩
       - name: 7z-mt
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64-mt/install windows-x64
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32-mt/install windows-x86
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-x64-mt/install windows-x64
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-Win32-mt/install windows-x86
           7z a ${{ env.PKG_NAME }}-mt.7z windows-x64 windows-x86
           rm windows-x64 -r -fo
           rm windows-x86 -r -fo
@@ -171,7 +171,7 @@ jobs:
             ${{ env.PKG_NAME }}-mt.7z
 
   release:
-    needs: [ ubuntu1804, macos1015, windows-vs2017 ]
+    needs: [ ubuntu1804, macos1015, windows-vs2019 ]
 
     runs-on: ubuntu-latest
 

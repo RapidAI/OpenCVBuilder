@@ -41,8 +41,8 @@ jobs:
       # install文件夹改名，并使用7z压缩
       - name: 7z-md
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64-md/install windows-x64
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32-md/install windows-x86
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-x64-md/install windows-x64
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-Win32-md/install windows-x86
           7z a ${{ env.PKG_NAME }}-md.7z windows-x64 windows-x86
           rm windows-x64 -r -fo
           rm windows-x86 -r -fo
@@ -58,8 +58,8 @@ jobs:
       # install文件夹改名，并使用7z压缩
       - name: 7z-mt
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-x64-mt/install windows-x64
-          mv opencv-${{ env.OPENCV_VERSION }}/build-v141-Win32-mt/install windows-x86
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-x64-mt/install windows-x64
+          mv opencv-${{ env.OPENCV_VERSION }}/build-v142-Win32-mt/install windows-x86
           7z a ${{ env.PKG_NAME }}-mt.7z windows-x64 windows-x86
           rm windows-x64 -r -fo
           rm windows-x86 -r -fo
