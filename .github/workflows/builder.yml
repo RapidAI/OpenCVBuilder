@@ -16,11 +16,11 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencv/opencv
           path: opencv-${{ env.OPENCV_VERSION }}
@@ -47,7 +47,7 @@ jobs:
 
       # 上传artifact
       - name: upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_NAME }}.7z
@@ -61,11 +61,11 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencv/opencv
           path: opencv-${{ env.OPENCV_VERSION }}
@@ -97,7 +97,7 @@ jobs:
 
       # 上传artifact
       - name: upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_NAME }}.7z
@@ -111,11 +111,11 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencv/opencv
           path: opencv-${{ env.OPENCV_VERSION }}
@@ -147,7 +147,7 @@ jobs:
 
       # 上传artifact
       - name: upload-md
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}-md
           path: |
@@ -164,7 +164,7 @@ jobs:
 
       # 上传artifact
       - name: upload-mt
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}-mt
           path: |
@@ -177,7 +177,7 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # 获取所有的git log和tag
       - name: Unshallow
@@ -202,7 +202,7 @@ jobs:
 
       # 下载artifact
       - name: download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: artifacts
 
