@@ -246,22 +246,22 @@ jobs:
           asset_name: ${{ env.PKG_NAME }}.7z
           asset_content_type: application/x-7z-compressed
 
-      - name: upload-windows-vs2017-md
+      - name: upload-windows-vs2019-md
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.6.0-windows-vs2017-md
+          PKG_NAME: opencv-4.6.0-windows-vs2019-md
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
           asset_name: ${{ env.PKG_NAME }}.7z
           asset_content_type: application/x-7z-compressed
 
-      - name: upload-windows-vs2017-mt
+      - name: upload-windows-vs2019-mt
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.6.0-windows-vs2017-mt
+          PKG_NAME: opencv-4.6.0-windows-vs2019-mt
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
