@@ -6,22 +6,22 @@ SETLOCAL EnableDelayedExpansion
 
 for /f "Delims=" %%x in (opencv4_cmake_options.txt) do set OPTIONS=!OPTIONS!%%x 
 
-call :cmakeParams "Visual Studio 16 2019" "v142" "x64" "md"
-call :cmakeParams "Visual Studio 16 2019" "v142" "Win32" "md"
-call :cmakeParams "Visual Studio 16 2019" "v142" "x64" "mt"
-call :cmakeParams "Visual Studio 16 2019" "v142" "Win32" "mt"
+call :cmakeParams "v142" "x64" "md"
+call :cmakeParams "v142" "Win32" "md"
+call :cmakeParams "v142" "x64" "mt"
+call :cmakeParams "v142" "Win32" "mt"
 GOTO:EOF
 
 :cmakeParams
-mkdir "build-%~2-%~3-%~4"
-pushd "build-%~2-%~3-%~4"
-if "%~4" == "md" (
+mkdir "build-%~1-%~2-%~3"
+pushd "build-%~1-%~2-%~3"
+if "%~3" == "md" (
     set STATIC_CRT_ENABLED="OFF"
 )^
 else (
     set STATIC_CRT_ENABLED="ON"
 )
-cmake -G "%~1" -T "%~2,host=x64" -A "%~3" -DCMAKE_INSTALL_PREFIX=install ^
+cmake -T "%~1,host=x64" -A "%~2" -DCMAKE_INSTALL_PREFIX=install ^
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_CONFIGURATION_TYPES=Release ^
   -DBUILD_WITH_STATIC_CRT=%STATIC_CRT_ENABLED% %OPTIONS% ^
   ..

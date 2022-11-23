@@ -143,6 +143,13 @@ jobs:
           ref: ${{ env.OPENCV_VERSION }}
           submodules: recursive
 
+      # 下载ant
+      - name: dl apache ant
+        run: |
+          Invoke-WebRequest -Uri https://downloads.apache.org/ant/binaries/apache-ant-1.10.12-bin.zip -OutFile apache-ant-1.10.12-bin.zip
+          7z x apache-ant-1.10.12-bin.zip -aoa
+          mv apache-ant-1.10.12 C:\
+
       # 复制编译脚本
       - name: copy build script
         run: |
@@ -154,6 +161,8 @@ jobs:
       #- uses: ilammy/msvc-dev-cmd@v1
       - name: build opencv
         run: |
+          $env:ANT_HOME="C:/apache-ant-1.10.12"
+          $env:Path+=";C:/apache-ant-1.10.12/bin"
           cd opencv-${{ env.OPENCV_VERSION }}
           ./build-opencv4-vs2019.bat
 
