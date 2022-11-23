@@ -59,12 +59,12 @@
 -DBUILD_TESTS=OFF
 -DBUILD_FAT_JAVA_LIB=OFF
 -DBUILD_ANDROID_SERVICE=OFF
--DBUILD_JAVA=OFF
+-DBUILD_JAVA=ON
 -DBUILD_OBJC=OFF
 -DENABLE_PRECOMPILED_HEADERS=OFF
 -DENABLE_FAST_MATH=OFF
 -DCV_TRACE=OFF
--DBUILD_opencv_java=OFF
+-DBUILD_opencv_java=ON
 -DBUILD_opencv_gapi=OFF
 -DBUILD_opencv_objc=OFF
 -DBUILD_opencv_js=OFF
@@ -75,7 +75,7 @@
 -DBUILD_opencv_imgcodecs=ON
 -DBUILD_opencv_videoio=OFF
 -DBUILD_opencv_calib3d=OFF
--DBUILD_opencv_flann=OFF
+-DBUILD_opencv_flann=ON
 -DBUILD_opencv_objdetect=OFF
 -DBUILD_opencv_stitching=OFF
 -DBUILD_opencv_ml=OFF
