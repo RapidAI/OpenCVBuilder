@@ -107,3 +107,7 @@ opencv 4.6.0
 ### 20221123 update
 - BUILD_JAVA=ON, BUILD_opencv_java=ON, BUILD_opencv_flann=ON
 - 输出java binding，位置在Release/install/share/java
+
+### 20221231 update
+- opencv 4.7.0
+- 
