@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
-      OPENCV_VERSION: 4.7.0
-      PKG_NAME: opencv-4.7.0-ubuntu2004
+      OPENCV_VERSION: 4.8.0
+      PKG_NAME: opencv-4.8.0-ubuntu2004
 
     steps:
       # Setup JDK 11
@@ -63,8 +63,8 @@ jobs:
     runs-on: macos-latest
 
     env:
-      OPENCV_VERSION: 4.7.0
-      PKG_NAME: opencv-4.7.0-macos1015
+      OPENCV_VERSION: 4.8.0
+      PKG_NAME: opencv-4.8.0-macos1015
 
     steps:
       # Setup JDK 11
@@ -120,8 +120,8 @@ jobs:
     runs-on: windows-2019
 
     env:
-      OPENCV_VERSION: 4.7.0
-      PKG_NAME: opencv-4.7.0-windows-vs2019
+      OPENCV_VERSION: 4.8.0
+      PKG_NAME: opencv-4.8.0-windows-vs2019
 
     steps:
       # Setup JDK 11
@@ -258,7 +258,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.7.0-ubuntu2004
+          PKG_NAME: opencv-4.8.0-ubuntu2004
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
@@ -269,7 +269,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.7.0-macos1015
+          PKG_NAME: opencv-4.8.0-macos1015
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
@@ -280,7 +280,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.7.0-windows-vs2019-md
+          PKG_NAME: opencv-4.8.0-windows-vs2019-md
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z
@@ -291,7 +291,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PKG_NAME: opencv-4.7.0-windows-vs2019-mt
+          PKG_NAME: opencv-4.8.0-windows-vs2019-mt
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: artifacts/${{ env.PKG_NAME }}/${{ env.PKG_NAME }}.7z

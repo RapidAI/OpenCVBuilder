@@ -110,4 +110,6 @@ opencv 4.6.0
 
 ### 20221231 update
 - opencv 4.7.0
-- 
+
+### 20230722 update
+- opencv 4.8.0
