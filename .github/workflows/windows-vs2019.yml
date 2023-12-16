@@ -2,16 +2,26 @@ name: windows-vs2019
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 jobs:
   windows-vs2019:
     runs-on: windows-2019
 
     env:
-      OPENCV_VERSION: 4.6.0
-      PKG_NAME: opencv-4.6.0-windows-vs2019
+      OPENCV_VERSION: 4.8.1
+      PKG_NAME: opencv-4.8.1-windows-vs2019
 
     steps:
+      # Setup JDK 11
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
       # 检出代码
       - uses: actions/checkout@v2
 
@@ -71,3 +81,60 @@ jobs:
           name: ${{ env.PKG_NAME }}-mt
           path: |
             ${{ env.PKG_NAME }}-mt.7z
+
+  release:
+    needs: [ windows-vs2019 ]
+
+    runs-on: ubuntu-latest
+
+    env:
+      PKG_NAME: opencv-4.8.1-windows-vs2019
+
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v3
+
+      # 获取所有的git log和tag
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      # 获取git log 从 previousTag 到 lastTag
+      - name: Get git log
+        id: git-log
+        run: |
+          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+          lastTag=$(git describe --abbrev=0 --tags)
+          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+          echo "$log"
+          echo "log_state="$log"" >> $GITHUB_ENV
+
+      # 创建Changelog文件 triggered by git tag push
+      - name: Generate Changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo -e '${{ env.log_state }}' > release.md
+
+      # 下载artifact
+      - name: download
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      # 查看artifact
+      - name: list artifact
+        run: |
+          tree artifacts
+
+      # 创建release 上传release
+      # https://github.com/marketplace/actions/create-release
+      - name: upload-windows-vs2019-md and upload-windows-vs2019-mt
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: false
+          name: opencv-lite ${{ github.ref }}
+          bodyFile: release.md
+          artifacts: artifacts/${{ env.PKG_NAME }}-md/${{ env.PKG_NAME }}-md.7z,artifacts/${{ env.PKG_NAME }}-mt/${{ env.PKG_NAME }}-mt.7z
+          allowUpdates: true
+          artifactContentType: application/x-7z-compressed
+          token: ${{ secrets.GITHUB_TOKEN }}

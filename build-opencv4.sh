@@ -23,6 +23,19 @@ if [ $sysOS == "Darwin" ]; then
 elif [ $sysOS == "Linux" ]; then
   #echo "I'm Linux"
   NUM_THREADS=$(grep ^processor /proc/cpuinfo | wc -l)
+  if [ "$1" ]; then
+    echo "CC=$1"
+    export CC="$1"
+  else
+    echo "$1 CC is empty, use gcc"
+  fi
+
+  if [ "$2" ]; then
+   echo "CXX=$2"
+    export CXX="$2"
+  else
+    echo "$2 CXX is empty, use g++"
+  fi
   cmakeParams "Release"
 else
   echo "Other OS: $sysOS"

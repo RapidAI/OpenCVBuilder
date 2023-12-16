@@ -2,22 +2,101 @@ name: linux
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 jobs:
-  ubuntu1804:
-    runs-on: ubuntu-18.04
+  ubuntu2204:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu2204]
+        arch_type:
+          [
+            aarch64-linux-musl,
+            aarch64_be-linux-musl,
+            arm-linux-musleabi,
+            arm-linux-musleabihf,
+            armeb-linux-musleabi,
+            armeb-linux-musleabihf,
+            armel-linux-musleabi,
+            armel-linux-musleabihf,
+            armv5l-linux-musleabi,
+            armv5l-linux-musleabihf,
+            armv6-linux-musleabi,
+            armv6-linux-musleabihf,
+            armv7l-linux-musleabihf,
+            armv7m-linux-musleabi,
+            armv7r-linux-musleabihf,
+            i486-linux-musl,
+            i686-linux-musl,
+            m68k-linux-musl,
+            microblaze-linux-musl,
+            microblazeel-linux-musl,
+            mips-linux-musl,
+            mips-linux-muslsf,
+            mips-linux-musln32sf,
+            mips64-linux-musl,
+            mips64-linux-musln32,
+            mips64-linux-musln32sf,
+            mips64el-linux-musl,
+            mips64el-linux-musln32,
+            mips64el-linux-musln32sf,
+            mipsel-linux-musl,
+            mipsel-linux-musln32,
+            mipsel-linux-musln32sf,
+            mipsel-linux-muslsf,
+            or1k-linux-musl,
+            powerpc-linux-musl,
+            powerpc-linux-muslsf,
+            powerpc64-linux-musl,
+            powerpc64le-linux-musl,
+            powerpcle-linux-musl,
+            powerpcle-linux-muslsf,
+            riscv32-linux-musl,
+            riscv64-linux-musl,
+            s390x-linux-musl,
+            sh2-linux-musl,
+            sh2-linux-muslfdpic,
+            sh2eb-linux-musl,
+            sh2eb-linux-muslfdpic,
+            sh4-linux-musl,
+            sh4eb-linux-musl,
+            x86_64-linux-musl,
+            x86_64-linux-muslx32,
+          ]
+
+    name: ${{ matrix.arch_type }}-${{ matrix.os }}
 
     env:
-      OPENCV_VERSION: 4.6.0
-      PKG_NAME: opencv-4.6.0-ubuntu1804
+      TOOLCHAIN_VERSION: 20231224
+      OPENCV_VERSION: 4.8.1
+      PKG_NAME_PREFIX: opencv-4.8.1
 
     steps:
+      # Setup JDK 11
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
       # 检出代码
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      # 部署musl
+      - name: deploy musl
+        run: |
+          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ env.TOOLCHAIN_VERSION }}/${{ matrix.arch_type }}.7z -O ${{ matrix.arch_type }}.7z
+          7z x ${{ matrix.arch_type }}.7z -aoa
+          mv ${{ matrix.arch_type }}/ /opt/${{ matrix.arch_type }}/
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencv/opencv
           path: opencv-${{ env.OPENCV_VERSION }}
@@ -30,21 +109,56 @@ jobs:
           cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
           cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
 
-      # 编译opencv4 for ubuntu
+      # 编译opencv4
       - name: build opencv
         run: |
           cd opencv-${{ env.OPENCV_VERSION }}
-          chmod a+x build-opencv4.sh &&./build-opencv4.sh
+          chmod a+x build-opencv4.sh 
+          ./build-opencv4.sh "/opt/${{ matrix.arch_type }}/bin/${{ matrix.arch_type }}-gcc -static" "/opt/${{ matrix.arch_type }}/bin/${{ matrix.arch_type }}-g++ -static"
 
       # install文件夹改名linux，并使用7z压缩
       - name: 7zip
         run: |
           mv opencv-${{ env.OPENCV_VERSION }}/build-Release/install linux
-          7z a ${{ env.PKG_NAME }}.7z linux
+          7z a ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}.7z linux
 
       # 上传artifact
       - name: upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PKG_NAME }}
-          path: ${{ env.PKG_NAME }}.7z
+          name: ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}
+          path: ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}.7z
+
+      # 获取所有的git log和tag
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      # 获取git log 从 previousTag 到 lastTag
+      - name: Get git log
+        id: git-log
+        run: |
+          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+          lastTag=$(git describe --abbrev=0 --tags)
+          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+          echo "$log"
+          echo "log_state="$log"" >> $GITHUB_ENV
+
+      # 创建Changelog文件 triggered by git tag push
+      - name: Generate Changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo -e '${{ env.log_state }}' > release.md
+
+      # 创建release 上传release
+      # https://github.com/marketplace/actions/create-release
+      - name: Create release and upload-archive
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: false
+          name: opencv-lite ${{ github.ref }}
+          bodyFile: release.md
+          artifacts: ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}.7z
+          allowUpdates: true
+          artifactContentType: application/x-7z-compressed
+          token: ${{ secrets.GITHUB_TOKEN }}
