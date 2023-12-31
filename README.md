@@ -143,8 +143,10 @@ opencv 4.6.0
 
 - opencv 4.8.0
 
-### 20231224 update
+### 20231231 update
 
 - opencv 4.8.1
 - Linux平台使用musl toolchain编译
 - BUILD_JAVA=OFF, BUILD_opencv_java=OFF, BUILD_opencv_flann=OFF
+- 增加android builder
+- 升级windows builder
