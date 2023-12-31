@@ -104,10 +104,16 @@ sudo xcode-select --install
 2. 同步[OpenCV源代码](https://github.com/opencv/opencv) 到opencv文件夹
 
 3. 复制编译脚本和cmake选项
-   vs2019环境，复制[编译脚本vs2019](build-opencv4-vs2019.bat)和[cmake选项](opencv4_cmake_options.txt)到opencv文件夹
+   vs2019环境，复制[编译脚本](build-opencv4.bat)和[cmake选项](opencv4_cmake_options.txt)到opencv文件夹
 
 4. 开始菜单打开"x64 Native Tools Command Prompt for VS 2019"，
-   运行对应的编译脚本，编译结果在：opencv/build-xxx-xxx-xx/install，后缀md代表链接动态CRT，后缀mt代表链接静态CRT
+   运行编译脚本
+```shell
+#参数1可选v140、v141、v142、v143，代表vs2015，vs2017，vs2019，vs2022
+#参数2可选:mt、md，代表静态链接crt，动态链接crt
+build-opencv.bat v142 mt
+```
+5. 编译结果在：opencv/build-xxx-xxx-xx/install
 
 ### 20220524 update
 

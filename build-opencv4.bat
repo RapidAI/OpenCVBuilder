@@ -1,15 +1,31 @@
-:: build opencv 4.6.x for windows by benjaminwan
+:: build opencv 4 for windows by benjaminwan
 @ECHO OFF
 chcp 65001
 cls
 SETLOCAL EnableDelayedExpansion
 
+IF "%1"=="" (
+    echo input VS_VER none, use v142
+	set VS_VER="v142"
+)^
+ELSE (
+	echo input VS_VER:%1
+    set VS_VER="%1"
+)
+
+IF "%2"=="" (
+    echo input CRT none, use mt
+	set CRT="mt"
+)^
+ELSE (
+	echo input CRT:%2
+    set CRT="%2"
+)
+
 for /f "Delims=" %%x in (opencv4_cmake_options.txt) do set OPTIONS=!OPTIONS!%%x 
 
-call :cmakeParams "v142" "x64" "md"
-call :cmakeParams "v142" "Win32" "md"
-call :cmakeParams "v142" "x64" "mt"
-call :cmakeParams "v142" "Win32" "mt"
+call :cmakeParams "x64" %VS_VER% %CRT%
+call :cmakeParams "Win32" %VS_VER% %CRT%
 GOTO:EOF
 
 :cmakeParams
@@ -21,7 +37,7 @@ if "%~3" == "md" (
 else (
     set STATIC_CRT_ENABLED="ON"
 )
-cmake -T "%~1,host=x64" -A "%~2" -DCMAKE_INSTALL_PREFIX=install ^
+cmake -A "%~1" -T "%~2,host=x64" -DCMAKE_INSTALL_PREFIX=install ^
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_CONFIGURATION_TYPES=Release ^
   -DBUILD_WITH_STATIC_CRT=%STATIC_CRT_ENABLED% %OPTIONS% ^
   ..
