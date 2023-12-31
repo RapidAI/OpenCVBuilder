@@ -23,11 +23,11 @@ jobs:
           distribution: 'adopt'
 
       # 检出代码
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencv/opencv
           path: opencv-${{ env.OPENCV_VERSION }}
@@ -59,7 +59,7 @@ jobs:
 
       # 上传artifact
       - name: upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_NAME }}.7z
