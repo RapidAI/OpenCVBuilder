@@ -7,13 +7,12 @@ on:
       - '*'
 
 jobs:
-  ubuntu2204:
+  ubuntu:
     runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu2204]
         arch_type:
           [
             aarch64-linux-musl,
@@ -69,10 +68,10 @@ jobs:
             x86_64-linux-muslx32,
           ]
 
-    name: ${{ matrix.arch_type }}-${{ matrix.os }}
+    name: ${{ matrix.arch_type }}
 
     env:
-      TOOLCHAIN_VERSION: 20231224
+      TOOLCHAIN_VERSION: 20240103
       OPENCV_VERSION: 4.8.1
       PKG_NAME_PREFIX: opencv-4.8.1
 
@@ -103,18 +102,19 @@ jobs:
           ref: ${{ env.OPENCV_VERSION }}
           submodules: recursive
 
-      # 复制编译脚本
-      - name: copy build script
+      # 复制
+      - name: copy
         run: |
           cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
           cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+          cp musl-cross.toolchain.cmake opencv-${{ env.OPENCV_VERSION }}
 
-      # 编译opencv4
+      # 编译
       - name: build opencv
         run: |
           cd opencv-${{ env.OPENCV_VERSION }}
           chmod a+x build-opencv4.sh 
-          ./build-opencv4.sh "/opt/${{ matrix.arch_type }}/bin/${{ matrix.arch_type }}-gcc -static" "/opt/${{ matrix.arch_type }}/bin/${{ matrix.arch_type }}-g++ -static"
+          ./build-opencv4.sh "${{ matrix.arch_type }}" "/opt/${{ matrix.arch_type }}"
 
       # install文件夹改名linux，并使用7z压缩
       - name: 7zip
