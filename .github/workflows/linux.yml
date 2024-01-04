@@ -107,6 +107,7 @@ jobs:
         run: |
           cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
           cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+          wget https://github.com/benjaminwan/musl-cross-builder/raw/main/musl-cross.toolchain.cmake -O musl-cross.toolchain.cmake
           cp musl-cross.toolchain.cmake opencv-${{ env.OPENCV_VERSION }}
 
       # 编译
