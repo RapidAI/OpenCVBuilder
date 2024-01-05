@@ -52,10 +52,13 @@ chmod a+x build-opencv4.sh
 
 4. 部署musl
    toolchain，部署方法参考工具链仓库的README，根据自己的目标平台下载对应的[工具链](https://github.com/benjaminwan/musl-cross-builder/releases)
-5. 开始编译
+5. 从工具链仓库下载musl-cross.toolchain.cmake，放到opencv根目录
+6. 开始编译
 
 ```shell
-./build-opencv4.sh "/opt/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static" "/opt/x86_64-linux-musl/bin/x86_64-linux-musl-g++ -static"
+#参数1代表工具链名称，可以从工具链仓库找到完整列表
+#参数2代表工具链路径
+./build-opencv4.sh "x86_64-linux-musl" "/opt/x86_64-linux-musl"
 ```
 
 编译结果在：opencv/build-Release/install
@@ -93,9 +96,9 @@ sudo xcode-select --install
 
 1. 编译环境:
 
-| 操作系统           | 基本软件包                                                                                            |
-|----------------|--------------------------------------------------------------------------------------------------|
-| Windows-vs2019 | [基本软件包](https://github.com/actions/runner-images/blob/main/images/windows/Windows2019-Readme.md) |
+| 操作系统         | 基本软件包                                                                                            |
+|--------------|--------------------------------------------------------------------------------------------------|
+| Windows-2019 | [基本软件包](https://github.com/actions/runner-images/blob/main/images/windows/Windows2019-Readme.md) |
 
 安装vs2019，并选中"C++桌面开发"
 
@@ -143,7 +146,7 @@ opencv 4.6.0
 
 - opencv 4.8.0
 
-### 20231231 update
+### 20230105 update
 
 - opencv 4.8.1
 - Linux平台使用musl toolchain编译
