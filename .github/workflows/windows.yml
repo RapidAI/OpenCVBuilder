@@ -50,22 +50,22 @@ jobs:
           ref: ${{ env.OPENCV_VERSION }}
           submodules: recursive
 
-      # 复制编译脚本
-      - name: copy build script
+      # 复制
+      - name: copy
         run: |
           cp build-opencv4.bat opencv-${{ env.OPENCV_VERSION }}
           cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
 
-      # 编译opencv for windows
+      # 编译
       # https://github.com/ilammy/msvc-dev-cmd
       #- uses: ilammy/msvc-dev-cmd@v1
-      - name: build opencv
+      - name: build
         run: |
           cd opencv-${{ env.OPENCV_VERSION }}
           ./build-opencv4.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
 
-      # install文件夹改名，并使用7z压缩
-      - name: 7z
+      # 7z压缩
+      - name: 7zip
         run: |
           mv opencv-${{ env.OPENCV_VERSION }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x64
           mv opencv-${{ env.OPENCV_VERSION }}/build-Win32-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x86

@@ -38,21 +38,21 @@ jobs:
           ref: ${{ env.OPENCV_VERSION }}
           submodules: recursive
 
-      # 复制编译脚本
+      # 复制
       - name: copy build script
         run: |
           cp build-opencv4-android.sh opencv-${{ env.OPENCV_VERSION }}
           cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
 
-      # 编译opencv
-      - name: build opencv
+      # 编译
+      - name: build
         run: |
           cd opencv-${{ env.OPENCV_VERSION }}
           chmod a+x build-opencv4-android.sh 
           ./build-opencv4-android.sh $ANDROID_NDK_LATEST_HOME
 
       # 压缩
-      - name: rename
+      - name: 7zip
         run: |
           mv opencv-${{ env.OPENCV_VERSION }}/opencv-android ${{ env.PKG_NAME }}
           7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}

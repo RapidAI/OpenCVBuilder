@@ -71,7 +71,7 @@ jobs:
     name: ${{ matrix.arch_type }}
 
     env:
-      TOOLCHAIN_VERSION: 20240103
+      TOOLCHAIN_VERSION: 20231224
       OPENCV_VERSION: 4.8.1
       PKG_NAME_PREFIX: opencv-4.8.1
 
@@ -117,7 +117,7 @@ jobs:
           chmod a+x build-opencv4.sh 
           ./build-opencv4.sh "${{ matrix.arch_type }}" "/opt/${{ matrix.arch_type }}"
 
-      # install文件夹改名linux，并使用7z压缩
+      # 7z压缩
       - name: 7zip
         run: |
           mv opencv-${{ env.OPENCV_VERSION }}/build-Release/install linux
