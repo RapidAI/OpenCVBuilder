@@ -7,12 +7,12 @@ on:
       - '*'
 
 jobs:
-  macos1272:
+  macos:
     runs-on: macos-latest
 
     env:
       OPENCV_VERSION: 4.8.1
-      PKG_NAME: opencv-4.8.1-macos1272
+      PKG_NAME: opencv-4.8.1-macos
 
     steps:
       # Setup JDK 11
