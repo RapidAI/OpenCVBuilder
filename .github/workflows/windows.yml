@@ -11,6 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        ver:
+          - { cv: 4.8.1 }
         list:
           - { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
           - { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
@@ -27,8 +29,8 @@ jobs:
     name: windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
 
     env:
-      OPENCV_VERSION: 4.8.1
-      PKG_NAME: opencv-4.8.1-windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.crt }}
 
     steps:
       # Setup JDK 11
@@ -46,30 +48,45 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: opencv/opencv
-          path: opencv-${{ env.OPENCV_VERSION }}
-          ref: ${{ env.OPENCV_VERSION }}
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
           submodules: recursive
 
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.bat opencv-${{ env.OPENCV_VERSION }}
-          cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+          cp build-opencv4.bat opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-java.bat opencv-${{ matrix.ver.cv }}
+          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       # https://github.com/ilammy/msvc-dev-cmd
       #- uses: ilammy/msvc-dev-cmd@v1
       - name: build
         run: |
-          cd opencv-${{ env.OPENCV_VERSION }}
+          cd opencv-${{ matrix.ver.cv }}
           ./build-opencv4.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
 
       # 7z压缩
       - name: 7zip
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x64
-          mv opencv-${{ env.OPENCV_VERSION }}/build-Win32-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x86
+          cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x64
+          cp -r opencv-${{ matrix.ver.cv }}/build-Win32-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x86
           7z a ${{ env.PKG_NAME }}.7z windows-x64 windows-x86
+          rm windows-x64 -r -fo
+          rm windows-x86 -r -fo
+
+      - name: build java
+        run: |
+          cd opencv-${{ matrix.ver.cv }}
+          ./build-opencv4-java.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+
+      # 7z压缩
+      - name: 7zip
+        run: |
+          cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x64
+          cp -r opencv-${{ matrix.ver.cv }}/build-Win32-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x86
+          7z a ${{ env.JAVA_PKG_NAME }}.7z windows-x64 windows-x86
           rm windows-x64 -r -fo
           rm windows-x86 -r -fo
 
@@ -78,8 +95,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
-          path: |
-            ${{ env.PKG_NAME }}.7z
+          path: ${{ env.PKG_NAME }}.7z
+
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.JAVA_PKG_NAME }}
+          path: ${{ env.JAVA_PKG_NAME }}.7z
 
   release:
     needs: [ windows ]
@@ -128,7 +150,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-          name: opencv-lite ${{ github.ref }}
           bodyFile: release.md
           artifacts: artifacts/*/*.7z
           allowUpdates: true

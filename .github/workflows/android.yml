@@ -10,9 +10,15 @@ jobs:
   android:
     runs-on: ubuntu-22.04
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ver:
+          - { cv: 4.8.1 }
+
     env:
       OPENCV_VERSION: 4.8.1
-      PKG_NAME: opencv-4.8.1-android
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-android
 
     steps:
       # Setup JDK 11
@@ -24,7 +30,7 @@ jobs:
 
       # 删除ndk -g参数
       - name: ndk del -g
-        run: sed -i -e '/^  -g$/d' $ANDROID_NDK_LATEST_HOME/build/cmake/android-legacy.toolchain.cmake
+        run: sed -i -e '/^  -g$/d' $ANDROID_NDK_HOME/build/cmake/android-legacy.toolchain.cmake
 
       # 检出代码
       - uses: actions/checkout@v3
@@ -34,27 +40,27 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: opencv/opencv
-          path: opencv-${{ env.OPENCV_VERSION }}
-          ref: ${{ env.OPENCV_VERSION }}
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
           submodules: recursive
 
       # 复制
       - name: copy build script
         run: |
-          cp build-opencv4-android.sh opencv-${{ env.OPENCV_VERSION }}
-          cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+          cp build-opencv4-android.sh opencv-${{ matrix.ver.cv }}
+          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
-          cd opencv-${{ env.OPENCV_VERSION }}
+          cd opencv-${{ matrix.ver.cv }}
           chmod a+x build-opencv4-android.sh 
-          ./build-opencv4-android.sh $ANDROID_NDK_LATEST_HOME
+          ./build-opencv4-android.sh $ANDROID_NDK_HOME
 
       # 压缩
       - name: 7zip
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/opencv-android ${{ env.PKG_NAME }}
+          mv opencv-${{ matrix.ver.cv }}/opencv-android ${{ env.PKG_NAME }}
           7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
 
       # 上传artifact
@@ -91,7 +97,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-          name: opencv-lite ${{ github.ref }}
           bodyFile: release.md
           artifacts: ${{ env.PKG_NAME }}.7z
           allowUpdates: true

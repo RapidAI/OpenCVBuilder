@@ -8,11 +8,19 @@ on:
 
 jobs:
   macos:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ver:
+          - { cv: 4.8.1 }
+        list:
+          - { os_ver: 11 }
+
+    runs-on: macos-${{ matrix.list.os_ver }}
 
     env:
-      OPENCV_VERSION: 4.8.1
-      PKG_NAME: opencv-4.8.1-macos
+      PKG_NAME: opencv-4.8.1-macos-${{ matrix.list.os_ver }}
+      JAVA_PKG_NAME: opencv-4.8.1-macos-${{ matrix.list.os_ver }}-java
 
     steps:
       # Setup JDK 11
@@ -30,32 +38,45 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: opencv/opencv
-          path: opencv-${{ env.OPENCV_VERSION }}
-          ref: ${{ env.OPENCV_VERSION }}
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
           submodules: recursive
 
       # 安装openmp
-      - name: install openmp
-        run: |
-          brew install libomp
+      #- name: install openmp
+      #  run: |
+      #    brew install libomp
 
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
-          cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
+          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-java.sh opencv-${{ matrix.ver.cv }}
+          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
-          cd opencv-${{ env.OPENCV_VERSION }}
+          cd opencv-${{ matrix.ver.cv }}
           chmod a+x build-opencv4.sh &&./build-opencv4.sh
 
       # 7z压缩
       - name: 7zip
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-Release/install macos
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install macos
           7z a ${{ env.PKG_NAME }}.7z macos
+
+      # 编译
+      - name: build java
+        run: |
+          cd opencv-${{ matrix.ver.cv }}
+          chmod a+x build-opencv4-java.sh &&./build-opencv4-java.sh
+
+      # 7z压缩
+      - name: 7zip
+        run: |
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
+          7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact
       - name: upload
@@ -63,6 +84,13 @@ jobs:
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_NAME }}.7z
+
+      # 上传artifact
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.JAVA_PKG_NAME }}
+          path: ${{ env.JAVA_PKG_NAME }}.7z
 
       # 获取所有的git log和tag
       - name: Unshallow
@@ -91,9 +119,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-          name: opencv-lite ${{ github.ref }}
           bodyFile: release.md
-          artifacts: ${{ env.PKG_NAME }}.7z
+          artifacts: ${{ env.PKG_NAME }}.7z, ${{ env.JAVA_PKG_NAME }}.7z
           allowUpdates: true
           artifactContentType: application/x-7z-compressed
           token: ${{ secrets.GITHUB_TOKEN }}

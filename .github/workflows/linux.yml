@@ -1,4 +1,4 @@
-name: linux
+name: ubuntu
 
 on:
   workflow_dispatch:
@@ -7,128 +7,141 @@ on:
       - '*'
 
 jobs:
-  linux:
-    runs-on: ubuntu-22.04
+  ubuntu:
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        arch_type:
+        os_name: [ubuntu]
+        ver:
+          - { cv: 4.8.1, cmake: 3.28.2, python: 3.8.18, ant: 1.10.14, jdk: openjdk-8-jdk }
+        list:
+          - { os_ver: 14.04, os_id: trusty }
+          - { os_ver: 16.04, os_id: xenial }
+          - { os_ver: 18.04, os_id: bionic }
+          - { os_ver: 20.04, os_id: focal }
+          - { os_ver: 22.04, os_id: jammy }
+        arch:
           [
-            aarch64-linux-musl,
-            aarch64_be-linux-musl,
-            arm-linux-musleabi,
-            arm-linux-musleabihf,
-            armeb-linux-musleabi,
-            armeb-linux-musleabihf,
-            armel-linux-musleabi,
-            armel-linux-musleabihf,
-            armv5l-linux-musleabi,
-            armv5l-linux-musleabihf,
-            armv6-linux-musleabi,
-            armv6-linux-musleabihf,
-            armv7l-linux-musleabihf,
-            armv7m-linux-musleabi,
-            armv7r-linux-musleabihf,
-            i486-linux-musl,
-            i686-linux-musl,
-            m68k-linux-musl,
-            microblaze-linux-musl,
-            microblazeel-linux-musl,
-            mips-linux-musl,
-            mips-linux-muslsf,
-            mips-linux-musln32sf,
-            mips64-linux-musl,
-            mips64-linux-musln32,
-            mips64-linux-musln32sf,
-            mips64el-linux-musl,
-            mips64el-linux-musln32,
-            mips64el-linux-musln32sf,
-            mipsel-linux-musl,
-            mipsel-linux-musln32,
-            mipsel-linux-musln32sf,
-            mipsel-linux-muslsf,
-            or1k-linux-musl,
-            powerpc-linux-musl,
-            powerpc-linux-muslsf,
-            powerpc64-linux-musl,
-            powerpc64le-linux-musl,
-            powerpcle-linux-musl,
-            powerpcle-linux-muslsf,
-            riscv32-linux-musl,
-            riscv64-linux-musl,
-            s390x-linux-musl,
-            sh2-linux-musl,
-            sh2-linux-muslfdpic,
-            sh2eb-linux-musl,
-            sh2eb-linux-muslfdpic,
-            sh4-linux-musl,
-            sh4eb-linux-musl,
-            x86_64-linux-musl,
-            x86_64-linux-muslx32,
+            amd64,
+            arm,
+            arm64,
+            ppc64le,
           ]
 
-    name: ${{ matrix.arch_type }}
+    name: ubuntu-${{ matrix.list.os_ver }}-${{ matrix.arch }}
 
     env:
-      TOOLCHAIN_VERSION: 20231224
-      OPENCV_VERSION: 4.8.1
-      PKG_NAME_PREFIX: opencv-4.8.1
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-ubuntu-${{ matrix.list.os_ver }}-${{ matrix.arch }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-ubuntu-${{ matrix.list.os_ver }}-${{ matrix.arch }}-java
 
     steps:
-      # Setup JDK 11
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-
       # 检出代码
       - uses: actions/checkout@v3
-
-      # 部署musl
-      - name: deploy musl
-        run: |
-          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ env.TOOLCHAIN_VERSION }}/${{ matrix.arch_type }}.7z -O ${{ matrix.arch_type }}.7z
-          7z x ${{ matrix.arch_type }}.7z -aoa
-          mv ${{ matrix.arch_type }}/ /opt/${{ matrix.arch_type }}/
 
       # 检出opencv
       - name: checkout opencv
         uses: actions/checkout@v3
         with:
           repository: opencv/opencv
-          path: opencv-${{ env.OPENCV_VERSION }}
-          ref: ${{ env.OPENCV_VERSION }}
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
           submodules: recursive
 
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ env.OPENCV_VERSION }}
-          cp opencv4_cmake_options.txt opencv-${{ env.OPENCV_VERSION }}
-          wget https://github.com/benjaminwan/musl-cross-builder/raw/main/musl-cross.toolchain.cmake -O musl-cross.toolchain.cmake
-          cp musl-cross.toolchain.cmake opencv-${{ env.OPENCV_VERSION }}
+          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-java.sh opencv-${{ matrix.ver.cv }}
+          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
-      # 编译
-      - name: build opencv
+      - name: Host - update
+        run: sudo apt-get update
+
+      - name: Host - Install host qemu-static
+        run: sudo apt-get install -y qemu binfmt-support qemu-user-static
+
+      - name: Host - Docker multiarch bootstrap
+        run: sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: deploy cmake
         run: |
-          cd opencv-${{ env.OPENCV_VERSION }}
-          chmod a+x build-opencv4.sh 
-          ./build-opencv4.sh "${{ matrix.arch_type }}" "/opt/${{ matrix.arch_type }}"
+          wget https://github.com/benjaminwan/CmakeBuilder/releases/download/${{ matrix.ver.cmake }}/cmake-${{ matrix.ver.cmake }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}.7z -O cmake-${{ matrix.ver.cmake }}.7z
+          7z x cmake-${{ matrix.ver.cmake }}.7z -aoa
 
-      # 7z压缩
+      - name: deploy python
+        run: |
+          wget https://github.com/benjaminwan/PythonBuilder/releases/download/${{ matrix.ver.python }}/python-${{ matrix.ver.python }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}.7z -O python-${{ matrix.ver.python }}.7z
+          7z x python-${{ matrix.ver.python }}.7z -aoa
+
+      - name: deploy ant
+        run: |
+          wget https://dlcdn.apache.org/ant/binaries/apache-ant-${{ matrix.ver.ant }}-bin.tar.gz -O apache-ant-${{ matrix.ver.ant }}.tar.gz
+          tar -xf apache-ant-${{ matrix.ver.ant }}.tar.gz
+
+      - name: Host - Create Docker template env file
+        run: |
+          echo "PATH=/root/cmake-${{ matrix.ver.cmake }}/bin:/root/python-${{ matrix.ver.python }}/bin:/root/apache-ant-${{ matrix.ver.ant }}/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" > env.custom
+          echo "DEBIAN_FRONTEND=noninteractive" >> env.custom
+          echo "TZ=Etc/UTC" >> env.custom
+
+      - name: Host - Create docker container
+        run: docker run --name ${{ matrix.os_name }} --env-file env.custom --platform linux/${{ matrix.arch }} -it -d -w /root -v ${{ github.workspace }}:/root ${{ matrix.os_name }}:${{ matrix.list.os_id }}
+
+      - name: Docker - apt-get update
+        run: docker exec --env-file env.custom -w /root ${{ matrix.os_name }} apt-get update
+
+      - name: Docker - install build deps
+        run: docker exec --env-file env.custom -w /root ${{ matrix.os_name }} apt-get install -y build-essential git software-properties-common
+
+      - name: Docker - install jdk
+        run: |
+          docker exec --env-file env.custom -w /root ${{ matrix.os_name }} add-apt-repository -y ppa:openjdk-r/ppa
+          docker exec --env-file env.custom -w /root ${{ matrix.os_name }} apt-get update
+          docker exec --env-file env.custom -w /root ${{ matrix.os_name }} apt-get -y install ${{ matrix.ver.jdk }}
+          docker exec --env-file env.custom -w /root ${{ matrix.os_name }} java -version
+          JAVA_DIR=$(docker exec ${{ matrix.os_name }} readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+          echo "$JAVA_DIR"
+          echo "JAVA_HOME=$JAVA_DIR" >> env.custom
+          echo "JAVA_INCLUDE_PATH=$JAVA_DIR/include" >> env.custom
+
+      - name: Docker - build
+        run: |
+          docker exec --env-file env.custom -w /root ${{ matrix.os_name }} git config --global --add safe.directory "*"
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4.sh
+
+      # install文件夹改名linux，并使用7z压缩
       - name: 7zip
         run: |
-          mv opencv-${{ env.OPENCV_VERSION }}/build-Release/install linux
-          7z a ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}.7z linux
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install linux
+          7z a ${{ env.PKG_NAME }}.7z linux
+          rm -r -f linux
+
+      - name: Docker - build
+        run: |
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4-java.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4-java.sh
+
+      - name: 7zip java
+        run: |
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
+          7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact
       - name: upload
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}
-          path: ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}.7z
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_NAME }}.7z
+
+      # 上传artifact
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.JAVA_PKG_NAME }}
+          path: ${{ env.JAVA_PKG_NAME }}.7z
 
       # 获取所有的git log和tag
       - name: Unshallow
@@ -157,9 +170,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-          name: opencv-lite ${{ github.ref }}
           bodyFile: release.md
-          artifacts: ${{ env.PKG_NAME_PREFIX }}-${{ matrix.arch_type }}.7z
+          artifacts: ${{ env.PKG_NAME }}.7z, ${{ env.JAVA_PKG_NAME }}.7z
           allowUpdates: true
           artifactContentType: application/x-7z-compressed
           token: ${{ secrets.GITHUB_TOKEN }}
