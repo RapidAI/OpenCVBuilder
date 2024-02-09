@@ -15,7 +15,7 @@ jobs:
       matrix:
         os_name: [ubuntu]
         ver:
-          - { cv: 4.8.1, cmake: 3.28.2, python: 3.8.18, ant: 1.10.14, jdk: openjdk-8-jdk }
+          - { cv: 3.4.16, cmake: 3.28.2, python: 3.8.18, ant: 1.10.14, jdk: openjdk-8-jdk }
         list:
           - { os_ver: 14.04, os_id: trusty }
           - { os_ver: 16.04, os_id: xenial }
@@ -52,9 +52,9 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
-          cp build-opencv4-java.sh opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp build-opencv3.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv3-java.sh opencv-${{ matrix.ver.cv }}
+          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       - name: Host - update
         run: sudo apt-get update
@@ -109,8 +109,8 @@ jobs:
       - name: Docker - build
         run: |
           docker exec --env-file env.custom -w /root ${{ matrix.os_name }} git config --global --add safe.directory "*"
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4.sh
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv3.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv3.sh
 
       # install文件夹改名linux，并使用7z压缩
       - name: 7zip
@@ -121,12 +121,12 @@ jobs:
 
       - name: Docker - build
         run: |
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4-java.sh
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4-java.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv3-java.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv3-java.sh
 
       - name: 7zip java
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/OpenCV/java ${{ env.JAVA_PKG_NAME }}
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact

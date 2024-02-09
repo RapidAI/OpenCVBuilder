@@ -12,15 +12,15 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1 }
+          - { cv: 3.4.16 }
         list:
           - { os_ver: 11 }
 
     runs-on: macos-${{ matrix.list.os_ver }}
 
     env:
-      PKG_NAME: opencv-4.8.1-macos-${{ matrix.list.os_ver }}
-      JAVA_PKG_NAME: opencv-4.8.1-macos-${{ matrix.list.os_ver }}-java
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-java
 
     steps:
       # Setup JDK 11
@@ -50,15 +50,15 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
-          cp build-opencv4-java.sh opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp build-opencv3.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv3-java.sh opencv-${{ matrix.ver.cv }}
+          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4.sh &&./build-opencv4.sh
+          chmod a+x build-opencv3.sh &&./build-opencv3.sh
 
       # 7z压缩
       - name: 7zip
@@ -70,12 +70,12 @@ jobs:
       - name: build java
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4-java.sh &&./build-opencv4-java.sh
+          chmod a+x build-opencv3-java.sh &&./build-opencv3-java.sh
 
       # 7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/OpenCV/java ${{ env.JAVA_PKG_NAME }}
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact

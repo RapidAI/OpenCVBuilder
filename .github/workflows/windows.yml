@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1 }
+          - { cv: 3.4.16 }
         list:
           - { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
           - { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
@@ -55,9 +55,9 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.bat opencv-${{ matrix.ver.cv }}
-          cp build-opencv4-java.bat opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp build-opencv3.bat opencv-${{ matrix.ver.cv }}
+          cp build-opencv3-java.bat opencv-${{ matrix.ver.cv }}
+          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       # https://github.com/ilammy/msvc-dev-cmd
@@ -65,7 +65,7 @@ jobs:
       - name: build
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv4.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          ./build-opencv3.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
 
       # 7z压缩
       - name: 7zip
@@ -79,7 +79,7 @@ jobs:
       - name: build java
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv4-java.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          ./build-opencv3-java.bat ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
 
       # 7z压缩
       - name: 7zip

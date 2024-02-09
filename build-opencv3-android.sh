@@ -7,7 +7,7 @@ function cmakeParams() {
     -DCMAKE_INSTALL_PREFIX=install \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$1" -DANDROID_ARM_NEON=ON \
-    $(cat ../opencv4_cmake_options.txt) -DBUILD_opencv_world=OFF \
+    $(cat ../opencv3_cmake_options.txt) -DBUILD_opencv_world=OFF \
     ..
   cmake --build . --config Release -j $NUM_THREADS
   cmake --build . --config Release --target install

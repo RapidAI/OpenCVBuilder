@@ -14,10 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1 }
+          - { cv: 3.4.16 }
 
     env:
-      OPENCV_VERSION: 4.8.1
       PKG_NAME: opencv-${{ matrix.ver.cv }}-android
 
     steps:
@@ -47,15 +46,15 @@ jobs:
       # 复制
       - name: copy build script
         run: |
-          cp build-opencv4-android.sh opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp build-opencv3-android.sh opencv-${{ matrix.ver.cv }}
+          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4-android.sh 
-          ./build-opencv4-android.sh $ANDROID_NDK_HOME
+          chmod a+x build-opencv3-android.sh 
+          ./build-opencv3-android.sh $ANDROID_NDK_HOME
 
       # 压缩
       - name: 7zip

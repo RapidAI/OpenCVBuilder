@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build opencv 4.x base on https://github.com/nihui/opencv-mobile/blob/master/opencv4_cmake_options.txt
+# build opencv 3.x
 
 function cmakeBuild() {
   mkdir -p "build-$1"
@@ -7,11 +7,7 @@ function cmakeBuild() {
   cmake -DCMAKE_BUILD_TYPE=$1 \
     -DCMAKE_CONFIGURATION_TYPES=$1 \
     -DCMAKE_INSTALL_PREFIX=install \
-    $(cat ../opencv4_cmake_options.txt) \
-    -DBUILD_FAT_JAVA_LIB=ON \
-    -DBUILD_JAVA=ON \
-    -DBUILD_opencv_java=ON \
-    -DBUILD_opencv_flann=ON \
+    $(cat ../opencv3_cmake_options.txt) \
     ..
   cmake --build . -j $NUM_THREADS
   cmake --build . --target install
@@ -25,11 +21,7 @@ function cmakeCrossBuild() {
     -DCMAKE_BUILD_TYPE=$1 \
     -DCMAKE_CONFIGURATION_TYPES=$1 \
     -DCMAKE_INSTALL_PREFIX=install \
-    $(cat ../opencv4_cmake_options.txt) \
-    -DBUILD_FAT_JAVA_LIB=ON \
-    -DBUILD_JAVA=ON \
-    -DBUILD_opencv_java=ON \
-    -DBUILD_opencv_flann=ON \
+    $(cat ../opencv3_cmake_options.txt) \
     ..
   cmake --build . -j $NUM_THREADS
   cmake --build . --target install

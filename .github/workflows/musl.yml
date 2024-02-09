@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1, musl: 11.3.1 }
+          - { cv: 3.4.16, musl: 11.3.1 }
         arch:
           [
             aarch64-linux-musl,
@@ -94,8 +94,8 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp build-opencv3.sh opencv-${{ matrix.ver.cv }}
+          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
           wget https://github.com/benjaminwan/musl-cross-builder/raw/main/musl-cross.toolchain.cmake -O musl-cross.toolchain.cmake
           cp musl-cross.toolchain.cmake opencv-${{ matrix.ver.cv }}
 
@@ -103,8 +103,8 @@ jobs:
       - name: build opencv
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4.sh 
-          ./build-opencv4.sh "${{ matrix.arch }}" "/opt/${{ matrix.arch }}"
+          chmod a+x build-opencv3.sh 
+          ./build-opencv3.sh "${{ matrix.arch }}" "/opt/${{ matrix.arch }}"
 
       # 7z压缩
       - name: 7zip
