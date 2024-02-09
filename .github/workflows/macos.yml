@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 3.4.16 }
+          - { cv: 3.4.16, ant: 1.10.14 }
         list:
           - { os_ver: 11 }
 
@@ -29,6 +29,14 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - uses: cedx/setup-ant@v2
+        with:
+          optional-tasks: true
+          version: ${{ matrix.ver.ant }}
+
+      - name: ant version
+        run: ant -version
 
       # 检出代码
       - uses: actions/checkout@v3
