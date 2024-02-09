@@ -43,7 +43,7 @@ jobs:
       - uses: cedx/setup-ant@v2
         with:
           optional-tasks: true
-          version: 1.10.14
+          version: ${{ matrix.ver.ant }}
 
       - name: ant version
         run: ant -version

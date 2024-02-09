@@ -15,6 +15,9 @@ jobs:
           - { cv: 4.8.1, ant: 1.10.14 }
         list:
           - { os_ver: 11 }
+          - { os_ver: 12 }
+          - { os_ver: 13 }
+          - { os_ver: 14 }
 
     runs-on: macos-${{ matrix.list.os_ver }}
 
@@ -33,7 +36,7 @@ jobs:
       - uses: cedx/setup-ant@v2
         with:
           optional-tasks: true
-          version: 1.10.14
+          version: ${{ matrix.ver.ant }}
 
       - name: ant version
         run: ant -version
