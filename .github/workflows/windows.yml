@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1 }
+          - { cv: 4.8.1, ant: 1.10.14 }
         list:
           - { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
           - { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
@@ -39,6 +39,14 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - uses: cedx/setup-ant@v2
+        with:
+          optional-tasks: true
+          version: 1.10.14
+
+      - name: ant version
+        run: ant -version
 
       # 检出代码
       - uses: actions/checkout@v3

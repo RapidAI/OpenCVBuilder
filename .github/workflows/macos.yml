@@ -12,15 +12,15 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1 }
+          - { cv: 4.8.1, ant: 1.10.14 }
         list:
           - { os_ver: 11 }
 
     runs-on: macos-${{ matrix.list.os_ver }}
 
     env:
-      PKG_NAME: opencv-4.8.1-macos-${{ matrix.list.os_ver }}
-      JAVA_PKG_NAME: opencv-4.8.1-macos-${{ matrix.list.os_ver }}-java
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-java
 
     steps:
       # Setup JDK 11
@@ -29,6 +29,14 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - uses: cedx/setup-ant@v2
+        with:
+          optional-tasks: true
+          version: 1.10.14
+
+      - name: ant version
+        run: ant -version
 
       # 检出代码
       - uses: actions/checkout@v3
