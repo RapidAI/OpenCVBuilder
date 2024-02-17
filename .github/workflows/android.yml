@@ -14,19 +14,12 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 3.4.16 }
+          - { cv: 3.4.16, ndk: 25.2.9519653 }
 
     env:
       PKG_NAME: opencv-${{ matrix.ver.cv }}-android
 
     steps:
-      # Setup JDK 11
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-
       # 删除ndk -g参数
       - name: ndk del -g
         run: sed -i -e '/^  -g$/d' $ANDROID_NDK_HOME/build/cmake/android-legacy.toolchain.cmake
