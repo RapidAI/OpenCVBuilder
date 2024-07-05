@@ -1,0 +1,148 @@
+name: musl-zig
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux-musl:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ver:
+          - { cv: 4.9.0, zig: zig-linux-x86_64-0.13.0 }
+        target:
+          [
+            aarch64_be-linux-musl,
+            aarch64-linux-musl,
+            arm-linux-musleabi,
+            arm-linux-musleabihf,
+            thumb-linux-musleabi,
+            thumb-linux-musleabihf,
+            x86-linux-musl,
+            mips64el-linux-musl,
+            mips64-linux-musl,
+            mipsel-linux-musl,
+            mips-linux-musl,
+            powerpc64le-linux-musl,
+            powerpc64-linux-musl,
+            powerpc-linux-musl,
+            riscv64-linux-musl,
+            x86_64-linux-musl,
+            armeb-linux-musleabi,
+            armeb-linux-musleabihf,
+            loongarch64-linux-musl,
+            m68k-linux-musl,
+            riscv32-linux-musl,
+            s390x-linux-musl,
+            wasm32-freestanding-musl,
+            wasm32-wasi-musl,
+          ]
+        exclude:
+          - target: armeb-linux-musleabi
+          - target: armeb-linux-musleabihf
+          - target: loongarch64-linux-musl
+          - target: m68k-linux-musl
+          - target: riscv32-linux-musl
+          - target: s390x-linux-musl
+          - target: wasm32-wasi-musl
+
+    name: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
+
+    env:
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}-zig
+
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v3
+
+      # 部署zig
+      - name: deploy zig
+        run: |
+          wget https://ziglang.org/download/0.13.0/${{ matrix.ver.zig }}.tar.xz -O ${{ matrix.ver.zig }}.tar.xz
+          tar xvf ${{ matrix.ver.zig }}.tar.xz
+          mv ${{ matrix.ver.zig }}/ /opt/${{ matrix.ver.zig }}/
+          echo "/opt/${{ matrix.ver.zig }}" >> $GITHUB_PATH
+
+      # 检出opencv
+      - name: checkout opencv
+        uses: actions/checkout@v3
+        with:
+          repository: opencv/opencv
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
+          submodules: recursive
+
+      # 复制
+      - name: copy
+        run: |
+          cp build-opencv4-musl-zig.sh opencv-${{ matrix.ver.cv }}
+          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          wget https://github.com/benjaminwan/zig-cmake-musl-toolchain/raw/main/zig-musl.toolchain.cmake -O zig-musl.toolchain.cmake
+          cp zig-musl.toolchain.cmake opencv-${{ matrix.ver.cv }}
+          wget https://github.com/benjaminwan/zig-cmake-musl-toolchain/raw/main/zig-ar.sh -O zig-ar.sh
+          cp zig-ar.sh opencv-${{ matrix.ver.cv }}
+          wget https://github.com/benjaminwan/zig-cmake-musl-toolchain/raw/main/zig-c++.sh -O zig-c++.sh
+          cp zig-c++.sh opencv-${{ matrix.ver.cv }}
+          wget https://github.com/benjaminwan/zig-cmake-musl-toolchain/raw/main/zig-cc.sh -O zig-cc.sh
+          cp zig-cc.sh opencv-${{ matrix.ver.cv }}
+          wget https://github.com/benjaminwan/zig-cmake-musl-toolchain/raw/main/zig-ranlib.sh -O zig-ranlib.sh
+          cp zig-ranlib.sh opencv-${{ matrix.ver.cv }}
+
+      # 编译
+      - name: build opencv
+        run: |
+          cd opencv-${{ matrix.ver.cv }}
+          chmod a+x zig-ar.sh
+          chmod a+x zig-c++.sh
+          chmod a+x zig-cc.sh
+          chmod a+x zig-ranlib.sh
+          chmod a+x build-opencv4-musl-zig.sh
+          ./build-opencv4-musl-zig.sh "${{ matrix.target }}"
+
+      # 7z压缩
+      - name: 7zip
+        run: |
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.target }}/install linux
+          7z a ${{ env.PKG_NAME }}.7z linux
+
+      # 上传artifact
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_NAME }}.7z
+
+      # 获取所有的git log和tag
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      # 获取git log 从 previousTag 到 lastTag
+      - name: Get git log
+        id: git-log
+        run: |
+          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+          lastTag=$(git describe --abbrev=0 --tags)
+          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+          echo "$log"
+          echo "log_state="$log"" >> $GITHUB_ENV
+
+      # 创建Changelog文件 triggered by git tag push
+      - name: Generate Changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo -e '${{ env.log_state }}' > release.md
+
+      # 创建release 上传release
+      # https://github.com/marketplace/actions/create-release
+      - name: Create release and upload-archive
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: false
+          bodyFile: release.md
+          artifacts: ${{ env.PKG_NAME }}.7z
+          allowUpdates: true
+          artifactContentType: application/x-7z-compressed
+          token: ${{ secrets.GITHUB_TOKEN }}

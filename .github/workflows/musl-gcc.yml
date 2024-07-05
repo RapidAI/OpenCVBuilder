@@ -1,10 +1,7 @@
-name: musl
+name: musl-gcc
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
 
 jobs:
   linux-musl:
@@ -14,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1, musl: 11.3.1 }
+          - { cv: 4.9.0, musl: 11.3.1 }
         arch:
           [
             aarch64-linux-musl,
@@ -76,7 +73,7 @@ jobs:
       - uses: actions/checkout@v3
 
       # 部署musl
-      - name: deploy musl
+      - name: deploy musl toolchain
         run: |
           wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.arch }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.arch }}.7z
           7z x ${{ matrix.arch }}.7z -aoa

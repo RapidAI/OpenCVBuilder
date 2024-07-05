@@ -2,9 +2,6 @@ name: macos
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
 
 jobs:
   macos:
@@ -12,18 +9,22 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1, ant: 1.10.14 }
+          - { cv: 4.9.0, ant: 1.10.14 }
         list:
           - { os_ver: 11 }
           - { os_ver: 12 }
           - { os_ver: 13 }
-          - { os_ver: 14 }
+        arch:
+          [
+            x86_64,
+            arm64,
+          ]
 
-    runs-on: macos-${{ matrix.list.os_ver }}
+    runs-on: macos-${{ matrix.list.os_ver }}-${{ matrix.arch }}
 
     env:
-      PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}
-      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-java
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-${{ matrix.arch }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-${{ matrix.arch }}-java
 
     steps:
       # Setup JDK 8
@@ -61,32 +62,32 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
-          cp build-opencv4-java.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-mac.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-mac-java.sh opencv-${{ matrix.ver.cv }}
           cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4.sh &&./build-opencv4.sh
+          chmod a+x build-opencv4-mac.sh &&./build-opencv4-mac.sh "${{ matrix.arch }}"
 
       # 7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install macos
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install macos
           7z a ${{ env.PKG_NAME }}.7z macos
 
       # 编译
       - name: build java
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4-java.sh &&./build-opencv4-java.sh
+          chmod a+x build-opencv4-mac-java.sh &&./build-opencv4-mac-java.sh "${{ matrix.arch }}"
 
       # 7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact

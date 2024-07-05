@@ -2,9 +2,6 @@ name: android
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
 
 jobs:
   android:
@@ -14,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.8.1, ndk: 25.2.9519653 }
+          - { cv: 4.9.0, ndk: 25.2.9519653 }
 
     env:
       PKG_NAME: opencv-${{ matrix.ver.cv }}-android

@@ -2,9 +2,6 @@ name: ubuntu
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
 
 jobs:
   ubuntu:
@@ -15,7 +12,7 @@ jobs:
       matrix:
         os_name: [ubuntu]
         ver:
-          - { cv: 4.8.1, cmake: 3.28.2, python: 3.8.18, ant: 1.10.14, jdk: openjdk-8-jdk }
+          - { cv: 4.9.0, cmake: 3.28.6, python: 3.8.19, ant: 1.10.14, jdk: openjdk-8-jdk }
         list:
           - { os_ver: 14.04, os_id: trusty }
           - { os_ver: 16.04, os_id: xenial }
@@ -24,11 +21,19 @@ jobs:
           - { os_ver: 22.04, os_id: jammy }
         arch:
           [
+            386,
             amd64,
             arm,
             arm64,
             ppc64le,
           ]
+        exclude:
+          - list: { os_ver: 14.04, os_id: trusty }
+            arch: ppc64le
+          - list: { os_ver: 20.04, os_id: focal }
+            arch: 386
+          - list: { os_ver: 22.04, os_id: jammy }
+            arch: 386
 
     name: ubuntu-${{ matrix.list.os_ver }}-${{ matrix.arch }}
 
@@ -52,8 +57,8 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
-          cp build-opencv4-java.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-linux.sh opencv-${{ matrix.ver.cv }}
+          cp build-opencv4-linux-java.sh opencv-${{ matrix.ver.cv }}
           cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       - name: Host - update
@@ -109,8 +114,8 @@ jobs:
       - name: Docker - build
         run: |
           docker exec --env-file env.custom -w /root ${{ matrix.os_name }} git config --global --add safe.directory "*"
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4.sh
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4-linux.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4-linux.sh "${{ matrix.arch }}"
 
       # install文件夹改名linux，并使用7z压缩
       - name: 7zip
@@ -121,8 +126,8 @@ jobs:
 
       - name: Docker - build
         run: |
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4-java.sh
-          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4-java.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x build-opencv4-linux-java.sh
+          docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./build-opencv4-linux-java.sh "${{ matrix.arch }}"
 
       - name: 7zip java
         run: |
