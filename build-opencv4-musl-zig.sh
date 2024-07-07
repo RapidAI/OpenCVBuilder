@@ -31,8 +31,6 @@ else
   export TOOLCHAIN_TARGET="x86_64-linux-musl"
 fi
 
-HOST_OS=$(uname -s)
-HOST_ARCH=$(uname -m)
 NUM_THREADS=$(grep ^processor /proc/cpuinfo | wc -l)
 BUILD_TYPE="Release"
 
