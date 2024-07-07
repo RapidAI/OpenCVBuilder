@@ -39,15 +39,16 @@ jobs:
             wasm32-freestanding-musl,
             wasm32-wasi-musl,
           ]
-#        exclude:
-#          - target: armeb-linux-musleabi
-#          - target: armeb-linux-musleabihf
-#          - target: loongarch64-linux-musl
-#          - target: m68k-linux-musl
-#          - target: riscv32-linux-musl
-#          - target: s390x-linux-musl
-#          - target: wasm32-freestanding-musl
-#          - target: wasm32-wasi-musl
+        exclude:
+          - target: powerpc64le-linux-musl
+          - target: armeb-linux-musleabi
+          - target: armeb-linux-musleabihf
+          - target: loongarch64-linux-musl
+          - target: m68k-linux-musl
+          - target: riscv32-linux-musl
+          - target: s390x-linux-musl
+          - target: wasm32-freestanding-musl
+          - target: wasm32-wasi-musl
 
     name: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
 
