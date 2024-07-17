@@ -135,18 +135,17 @@ jobs:
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact
-      - name: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.PKG_NAME }}
-          path: ${{ env.PKG_NAME }}.7z
+#      - name: upload
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ env.PKG_NAME }}
+#          path: ${{ env.PKG_NAME }}.7z
 
-      # 上传artifact
-      - name: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.JAVA_PKG_NAME }}
-          path: ${{ env.JAVA_PKG_NAME }}.7z
+#      - name: upload
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ env.JAVA_PKG_NAME }}
+#          path: ${{ env.JAVA_PKG_NAME }}.7z
 
       # 获取所有的git log和tag
       - name: Unshallow
@@ -176,7 +175,7 @@ jobs:
         with:
           prerelease: false
           bodyFile: release.md
-          artifacts: ${{ env.PKG_NAME }}.7z, ${{ env.JAVA_PKG_NAME }}.7z
+          artifacts: 'opencv-*.7z'
           allowUpdates: true
           artifactContentType: application/x-7z-compressed
           token: ${{ secrets.GITHUB_TOKEN }}

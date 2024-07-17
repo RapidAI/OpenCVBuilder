@@ -83,7 +83,6 @@ jobs:
           cd opencv-${{ matrix.ver.cv }}
           ./build-opencv3-win.bat ARM64 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
 
-      # 7z压缩
       - name: 7zip lib
         run: |
           cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x64
@@ -119,7 +118,6 @@ jobs:
           cd opencv-${{ matrix.ver.cv }}
           ./build-opencv3-win-java.bat ARM64 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
 
-            # 7z压缩
       - name: 7zip java
         run: |
           cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x64
@@ -140,13 +138,13 @@ jobs:
           rm windows-x86 -r -fo
 
       # 上传artifact
-      - name: upload
+      - name: upload lib
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_NAME }}.7z
 
-      - name: upload
+      - name: upload java lib
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.JAVA_PKG_NAME }}
