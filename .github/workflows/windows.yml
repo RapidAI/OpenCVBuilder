@@ -46,11 +46,11 @@ jobs:
         run: ant -version
 
       # 检出代码
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencv/opencv
           path: opencv-${{ matrix.ver.cv }}
@@ -159,7 +159,7 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 获取所有的git log和tag
       - name: Unshallow

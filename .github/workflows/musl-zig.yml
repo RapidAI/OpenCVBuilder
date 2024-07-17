@@ -56,7 +56,7 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 部署zig
       - name: deploy zig
@@ -68,7 +68,7 @@ jobs:
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencv/opencv
           path: opencv-${{ matrix.ver.cv }}
