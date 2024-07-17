@@ -22,11 +22,11 @@ jobs:
         run: sed -i -e '/^  -g$/d' $ANDROID_NDK_HOME/build/cmake/android-legacy.toolchain.cmake
 
       # 检出代码
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 检出opencv
       - name: checkout opencv
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencv/opencv
           path: opencv-${{ matrix.ver.cv }}
