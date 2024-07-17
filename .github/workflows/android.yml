@@ -53,11 +53,11 @@ jobs:
           7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
 
       # 上传artifact
-      - name: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.PKG_NAME }}
-          path: ${{ env.PKG_NAME }}.7z
+#      - name: upload
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ env.PKG_NAME }}
+#          path: ${{ env.PKG_NAME }}.7z
 
       # 获取所有的git log和tag
       - name: Unshallow
