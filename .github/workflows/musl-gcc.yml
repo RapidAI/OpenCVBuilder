@@ -1,0 +1,165 @@
+name: musl-gcc
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux-musl:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ver:
+          - { cv: 3.4.17, musl: 11.4.0 }
+        target:
+          [
+            aarch64-linux-musl,
+            aarch64_be-linux-musl,
+            arm-linux-musleabi,
+            arm-linux-musleabihf,
+            armeb-linux-musleabi,
+            armeb-linux-musleabihf,
+            armel-linux-musleabi,
+            armel-linux-musleabihf,
+            armv5l-linux-musleabi,
+            armv5l-linux-musleabihf,
+            armv5te-linux-musleabi,
+            armv6-linux-musleabi,
+            armv6-linux-musleabihf,
+            armv7-linux-musleabi,
+            armv7-linux-musleabihf,
+            armv7l-linux-musleabihf,
+            armv7m-linux-musleabi,
+            armv7r-linux-musleabihf,
+            i486-linux-musl,
+            i586-linux-musl,
+            i686-linux-musl,
+            m68k-linux-musl,
+            microblaze-linux-musl,
+            microblazeel-linux-musl,
+            mips-linux-musl,
+            mips-linux-muslsf,
+            mips-linux-musln32sf,
+            mips64-linux-musl,
+            mips64-linux-musln32,
+            mips64-linux-musln32sf,
+            mips64el-linux-musl,
+            mips64el-linux-musln32,
+            mips64el-linux-musln32sf,
+            mipsel-linux-musl,
+            mipsel-linux-musln32,
+            mipsel-linux-musln32sf,
+            mipsel-linux-muslsf,
+            or1k-linux-musl,
+            powerpc-linux-musl,
+            powerpc-linux-muslsf,
+            powerpc64-linux-musl,
+            powerpc64le-linux-musl,
+            powerpcle-linux-musl,
+            powerpcle-linux-muslsf,
+            riscv32-linux-musl,
+            riscv64-linux-musl,
+            s390x-linux-musl,
+            sh2-linux-musl,
+            sh2-linux-muslfdpic,
+            sh2eb-linux-musl,
+            sh2eb-linux-muslfdpic,
+            sh4-linux-musl,
+            sh4eb-linux-musl,
+            x86_64-linux-musl,
+            x86_64-linux-muslx32,
+            loongarch64-linux-musl,
+          ]
+        exclude:
+          - target: loongarch64-linux-musl
+
+    name: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
+
+    env:
+      BUILD_SCRIPT: build-opencv3-musl-gcc.sh
+      BUILD_OPTIONS: opencv3_cmake_options.txt
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
+
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v4
+
+      # 部署musl
+      - name: deploy musl
+        run: |
+          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.target }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.target }}.7z
+          7z x ${{ matrix.target }}.7z -aoa
+          mv ${{ matrix.target }}/ /opt/
+          echo "/opt/${{ matrix.target }}" >> $GITHUB_PATH
+
+      # 检出opencv
+      - name: checkout opencv
+        uses: actions/checkout@v4
+        with:
+          repository: opencv/opencv
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
+          submodules: recursive
+
+      # 复制
+      - name: copy
+        run: |
+          cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_OPTIONS }} opencv-${{ matrix.ver.cv }}
+          wget https://github.com/benjaminwan/musl-cross-builder/raw/main/musl-cross.toolchain.cmake -O musl-cross.toolchain.cmake
+          cp musl-cross.toolchain.cmake opencv-${{ matrix.ver.cv }}
+
+      # 编译
+      - name: build opencv
+        run: |
+          cd opencv-${{ matrix.ver.cv }}
+          chmod a+x ${{ env.BUILD_SCRIPT }}
+          ./${{ env.BUILD_SCRIPT }} -n '${{ matrix.target }}' -p '/opt/${{ matrix.target }}'
+
+      # 7z压缩
+      - name: 7zip
+        run: |
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.target }}/install linux
+          7z a ${{ env.PKG_NAME }}.7z linux
+          rm -r -f linux
+
+      # 上传artifact
+#      - name: upload
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ env.PKG_NAME }}
+#          path: ${{ env.PKG_NAME }}.7z
+
+      # 获取所有的git log和tag
+#      - name: Unshallow
+#        run: git fetch --prune --unshallow
+
+      # 获取git log 从 previousTag 到 lastTag
+#      - name: Get git log
+#        id: git-log
+#        run: |
+#          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+#          lastTag=$(git describe --abbrev=0 --tags)
+#          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+#          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+#          echo "$log"
+#          echo "log_state="$log"" >> $GITHUB_ENV
+
+      # 创建Changelog文件 triggered by git tag push
+#      - name: Generate Changelog
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          echo -e '${{ env.log_state }}' > release.md
+
+      # 创建release 上传release
+      # https://github.com/marketplace/actions/create-release
+      - name: Create release and upload-archive
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: false
+#          bodyFile: release.md
+          artifacts: ${{ env.PKG_NAME }}.7z
+          allowUpdates: true
+          artifactContentType: application/x-7z-compressed
+          token: ${{ secrets.GITHUB_TOKEN }}
