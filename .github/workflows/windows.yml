@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 3.4.17, ant: 1.10.14 }
+          - { cv: 3.4.17, jdk: 8, ant: 1.10.14 }
         list:
           - { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
           - { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
@@ -20,12 +20,15 @@ jobs:
             md,
             mt,
           ]
+        exclude:
+          - list: { win_ver: 2022, vs_name: vs2022, vs_ver: v143 }
 
     runs-on: windows-${{ matrix.list.win_ver }}
 
     name: windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
 
     env:
+      BUILD_SCRIPT: build-opencv-win.ps1
       PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
       JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.crt }}
 
@@ -34,7 +37,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: '${{ matrix.ver.jdk }}'
           distribution: 'adopt'
 
       - uses: cedx/setup-ant@v2
@@ -60,37 +63,39 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv3-win.bat opencv-${{ matrix.ver.cv }}
-          cp build-opencv3-win-java.bat opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
           cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
 
       # 编译
       # https://github.com/ilammy/msvc-dev-cmd
       #- uses: ilammy/msvc-dev-cmd@v1
       - name: build x64
+        shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv3-win.bat x64 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          .\${{ env.BUILD_SCRIPT }} -VsArch x64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} 
 
-      - name: build Win32
+      - name: build x86
+        shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv3-win.bat Win32 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          .\${{ env.BUILD_SCRIPT }} -VsArch x86 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }}
 
-      - name: build ARM64
+      - name: build arm64
         if: ${{ (matrix.list.vs_name == 'vs2019') || (matrix.list.vs_name == 'vs2022') }}
+        shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv3-win.bat ARM64 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          .\${{ env.BUILD_SCRIPT }} -VsArch arm64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} 
 
-      - name: 7zip lib
+      - name: 7zip libs
         run: |
           cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x64
-          cp -r opencv-${{ matrix.ver.cv }}/build-Win32-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x86
+          cp -r opencv-${{ matrix.ver.cv }}/build-x86-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x86
           if ( ("${{ matrix.list.vs_name }}" -eq "VS2019") -or ("${{ matrix.list.vs_name }}" -eq "VS2022") )
           {
             echo "vs2019 or vs2022 7z x64 x86 arm64"
-            cp -r opencv-${{ matrix.ver.cv }}/build-ARM64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-arm64
+            cp -r opencv-${{ matrix.ver.cv }}/build-arm64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-arm64
             7z a ${{ env.PKG_NAME }}.7z windows-x64 windows-x86 windows-arm64
             rm windows-arm64 -r -fo
           }
@@ -103,29 +108,32 @@ jobs:
           rm windows-x86 -r -fo
 
       - name: build java x64
+        shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv3-win-java.bat x64 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          .\${{ env.BUILD_SCRIPT }} -VsArch x64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
 
-      - name: build java Win32
+      - name: build java x86
+        shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv3-win-java.bat Win32 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          .\${{ env.BUILD_SCRIPT }} -VsArch x86 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
 
-      - name: build java ARM64
+      - name: build java arm64
         if: ${{ (matrix.list.vs_name == 'vs2019') || (matrix.list.vs_name == 'vs2022') }}
+        shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          ./build-opencv3-win-java.bat ARM64 ${{ matrix.list.vs_ver }} ${{ matrix.crt }}
+          .\${{ env.BUILD_SCRIPT }} -VsArch arm64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
 
       - name: 7zip java
         run: |
           cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x64
-          cp -r opencv-${{ matrix.ver.cv }}/build-Win32-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x86
+          cp -r opencv-${{ matrix.ver.cv }}/build-x86-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x86
           if ( ("${{ matrix.list.vs_name }}" -eq "VS2019") -or ("${{ matrix.list.vs_name }}" -eq "VS2022") )
           {
             echo "vs2019 or vs2022 7z x64 x86 arm64"
-            cp -r opencv-${{ matrix.ver.cv }}/build-ARM64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-arm64
+            cp -r opencv-${{ matrix.ver.cv }}/build-arm64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-arm64
             7z a ${{ env.JAVA_PKG_NAME }}.7z windows-x64 windows-x86 windows-arm64
             rm windows-arm64 -r -fo
           }
@@ -157,28 +165,28 @@ jobs:
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v4
+      #- uses: actions/checkout@v4
 
       # 获取所有的git log和tag
-      - name: Unshallow
-        run: git fetch --prune --unshallow
+#      - name: Unshallow
+#        run: git fetch --prune --unshallow
 
       # 获取git log 从 previousTag 到 lastTag
-      - name: Get git log
-        id: git-log
-        run: |
-          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-          lastTag=$(git describe --abbrev=0 --tags)
-          echo "previousTag:$previousTag ~ lastTag:$lastTag"
-          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
-          echo "$log"
-          echo "log_state="$log"" >> $GITHUB_ENV
+#      - name: Get git log
+#        id: git-log
+#        run: |
+#          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+#          lastTag=$(git describe --abbrev=0 --tags)
+#          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+#          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+#          echo "$log"
+#          echo "log_state="$log"" >> $GITHUB_ENV
 
       # 创建Changelog文件 triggered by git tag push
-      - name: Generate Changelog
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo -e '${{ env.log_state }}' > release.md
+#      - name: Generate Changelog
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          echo -e '${{ env.log_state }}' > release.md
 
       # 下载artifact
       - name: download
@@ -197,7 +205,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-          bodyFile: release.md
+#          bodyFile: release.md
           artifacts: artifacts/*/*.7z
           allowUpdates: true
           artifactContentType: application/x-7z-compressed
