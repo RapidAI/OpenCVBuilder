@@ -29,6 +29,7 @@ jobs:
 
     env:
       BUILD_SCRIPT: build-opencv-win.ps1
+      BUILD_OPTIONS: opencv3_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
       JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.crt }}
 
@@ -64,7 +65,7 @@ jobs:
       - name: copy
         run: |
           cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
-          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_OPTIONS }} opencv-${{ matrix.ver.cv }}
 
       # 编译
       # https://github.com/ilammy/msvc-dev-cmd
