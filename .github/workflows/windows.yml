@@ -28,7 +28,7 @@ jobs:
     name: windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
 
     env:
-      BUILD_SCRIPT: build-opencv-win.ps1
+      BUILD_SCRIPT: build-opencv3-win.ps1
       BUILD_OPTIONS: opencv3_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
       JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.crt }}
@@ -206,7 +206,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-#          bodyFile: release.md
+          bodyFile: release.md
           artifacts: artifacts/*/*.7z
           allowUpdates: true
           artifactContentType: application/x-7z-compressed

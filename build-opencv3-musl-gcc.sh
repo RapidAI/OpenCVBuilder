@@ -7,7 +7,7 @@ BUILD_TYPE=Release
 if [ $HOST_OS == "Linux" ]; then
     NUM_THREADS=$(nproc)
 else
-    echo "Unsupport OS: $HOST_OS"
+    echo "Unsupported OS: $HOST_OS"
     exit 0
 fi
 

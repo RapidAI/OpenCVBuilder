@@ -175,7 +175,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
-#          bodyFile: release.md
+          bodyFile: release.md
           artifacts: 'opencv-*.7z'
           allowUpdates: true
           artifactContentType: application/x-7z-compressed
