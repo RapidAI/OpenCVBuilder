@@ -42,10 +42,10 @@ BUILD_INSTALL_PATH="$BUILD_OUTPUT_PATH/install"
 
 mkdir -p "$BUILD_OUTPUT_PATH"
 cmake --compile-no-warning-as-error \
--B"$BUILD_OUTPUT_PATH" \
--DCMAKE_TOOLCHAIN_FILE=musl-cross.toolchain.cmake \
--DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CONFIGURATION_TYPES=$BUILD_TYPE \
--DCMAKE_INSTALL_PREFIX="$BUILD_INSTALL_PATH" \
-$(cat opencv3_cmake_options.txt)
+    -B"$BUILD_OUTPUT_PATH" \
+    -DCMAKE_TOOLCHAIN_FILE=musl-cross.toolchain.cmake \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CONFIGURATION_TYPES=$BUILD_TYPE \
+    -DCMAKE_INSTALL_PREFIX="$BUILD_INSTALL_PATH" \
+    $(cat opencv3_cmake_options.txt)
 
 cmake --build $BUILD_OUTPUT_PATH --config $BUILD_TYPE --parallel $NUM_THREADS --target install
