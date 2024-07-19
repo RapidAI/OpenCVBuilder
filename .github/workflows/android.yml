@@ -14,6 +14,8 @@ jobs:
           - { cv: 4.9.0, ndk: 25.2.9519653 }
 
     env:
+      BUILD_SCRIPT: build-opencv4-android.sh
+      BUILD_OPTIONS: opencv4_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-android
 
     steps:
@@ -36,15 +38,15 @@ jobs:
       # 复制
       - name: copy build script
         run: |
-          cp build-opencv4-android.sh opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_OPTIONS }} opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4-android.sh 
-          ./build-opencv4-android.sh $ANDROID_NDK_HOME
+          chmod a+x ${{ env.BUILD_SCRIPT }}
+          ./${{ env.BUILD_SCRIPT }} $ANDROID_NDK_HOME
 
       # 压缩
       - name: 7zip
@@ -60,25 +62,25 @@ jobs:
 #          path: ${{ env.PKG_NAME }}.7z
 
       # 获取所有的git log和tag
-      - name: Unshallow
-        run: git fetch --prune --unshallow
+#      - name: Unshallow
+#        run: git fetch --prune --unshallow
 
       # 获取git log 从 previousTag 到 lastTag
-      - name: Get git log
-        id: git-log
-        run: |
-          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-          lastTag=$(git describe --abbrev=0 --tags)
-          echo "previousTag:$previousTag ~ lastTag:$lastTag"
-          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
-          echo "$log"
-          echo "log_state="$log"" >> $GITHUB_ENV
+#      - name: Get git log
+#        id: git-log
+#        run: |
+#          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+#          lastTag=$(git describe --abbrev=0 --tags)
+#          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+#          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+#          echo "$log"
+#          echo "log_state="$log"" >> $GITHUB_ENV
 
       # 创建Changelog文件 triggered by git tag push
-      - name: Generate Changelog
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo -e '${{ env.log_state }}' > release.md
+#      - name: Generate Changelog
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          echo -e '${{ env.log_state }}' > release.md
 
       # 创建release 上传release
       # https://github.com/marketplace/actions/create-release

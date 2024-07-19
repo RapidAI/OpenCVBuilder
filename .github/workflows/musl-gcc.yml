@@ -11,8 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.9.0, musl: 11.3.1 }
-        arch:
+          - { cv: 4.9.0, musl: 11.4.0 }
+        target:
           [
             aarch64-linux-musl,
             aarch64_be-linux-musl,
@@ -24,12 +24,16 @@ jobs:
             armel-linux-musleabihf,
             armv5l-linux-musleabi,
             armv5l-linux-musleabihf,
+            armv5te-linux-musleabi,
             armv6-linux-musleabi,
             armv6-linux-musleabihf,
+            armv7-linux-musleabi,
+            armv7-linux-musleabihf,
             armv7l-linux-musleabihf,
             armv7m-linux-musleabi,
             armv7r-linux-musleabihf,
             i486-linux-musl,
+            i586-linux-musl,
             i686-linux-musl,
             m68k-linux-musl,
             microblaze-linux-musl,
@@ -52,32 +56,44 @@ jobs:
             powerpc-linux-muslsf,
             powerpc64-linux-musl,
             powerpc64le-linux-musl,
+            powerpcle-linux-musl,
+            powerpcle-linux-muslsf,
             riscv32-linux-musl,
             riscv64-linux-musl,
             s390x-linux-musl,
             sh2-linux-musl,
+            sh2-linux-muslfdpic,
             sh2eb-linux-musl,
+            sh2eb-linux-muslfdpic,
             sh4-linux-musl,
             sh4eb-linux-musl,
             x86_64-linux-musl,
             x86_64-linux-muslx32,
+            loongarch64-linux-musl,
           ]
+        exclude:
+          - target: loongarch64-linux-musl
+          - target: sh2-linux-muslfdpic
+          - target: sh2eb-linux-muslfdpic
 
-    name: opencv-${{ matrix.ver.cv }}-${{ matrix.arch }}
+    name: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
 
     env:
-      PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.arch }}
+      BUILD_SCRIPT: build-opencv4-musl-gcc.sh
+      BUILD_OPTIONS: opencv4_cmake_options.txt
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
 
     steps:
       # 检出代码
       - uses: actions/checkout@v4
 
       # 部署musl
-      - name: deploy musl toolchain
+      - name: deploy musl gcc
         run: |
-          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.arch }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.arch }}.7z
-          7z x ${{ matrix.arch }}.7z -aoa
-          mv ${{ matrix.arch }}/ /opt/${{ matrix.arch }}/
+          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.target }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.target }}.7z
+          7z x ${{ matrix.target }}.7z -aoa
+          mv ${{ matrix.target }}/ /opt/
+          echo "/opt/${{ matrix.target }}" >> $GITHUB_PATH
 
       # 检出opencv
       - name: checkout opencv
@@ -91,8 +107,8 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv4.sh opencv-${{ matrix.ver.cv }}
-          cp opencv4_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_OPTIONS }} opencv-${{ matrix.ver.cv }}
           wget https://github.com/benjaminwan/musl-cross-builder/raw/main/musl-cross.toolchain.cmake -O musl-cross.toolchain.cmake
           cp musl-cross.toolchain.cmake opencv-${{ matrix.ver.cv }}
 
@@ -100,14 +116,15 @@ jobs:
       - name: build opencv
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv4.sh 
-          ./build-opencv4.sh "${{ matrix.arch }}" "/opt/${{ matrix.arch }}"
+          chmod a+x ${{ env.BUILD_SCRIPT }}
+          ./${{ env.BUILD_SCRIPT }} -n '${{ matrix.target }}' -p '/opt/${{ matrix.target }}'
 
       # 7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release/install linux
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.target }}/install linux
           7z a ${{ env.PKG_NAME }}.7z linux
+          rm -r -f linux
 
       # 上传artifact
 #      - name: upload
@@ -117,25 +134,25 @@ jobs:
 #          path: ${{ env.PKG_NAME }}.7z
 
       # 获取所有的git log和tag
-      - name: Unshallow
-        run: git fetch --prune --unshallow
+#      - name: Unshallow
+#        run: git fetch --prune --unshallow
 
       # 获取git log 从 previousTag 到 lastTag
-      - name: Get git log
-        id: git-log
-        run: |
-          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-          lastTag=$(git describe --abbrev=0 --tags)
-          echo "previousTag:$previousTag ~ lastTag:$lastTag"
-          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
-          echo "$log"
-          echo "log_state="$log"" >> $GITHUB_ENV
+#      - name: Get git log
+#        id: git-log
+#        run: |
+#          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+#          lastTag=$(git describe --abbrev=0 --tags)
+#          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+#          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+#          echo "$log"
+#          echo "log_state="$log"" >> $GITHUB_ENV
 
       # 创建Changelog文件 triggered by git tag push
-      - name: Generate Changelog
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo -e '${{ env.log_state }}' > release.md
+#      - name: Generate Changelog
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          echo -e '${{ env.log_state }}' > release.md
 
       # 创建release 上传release
       # https://github.com/marketplace/actions/create-release
