@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.9.0, musl: 12.2.0 }
+          - { cv: 4.9.0, musl: 13.2.0 }
         target:
           [
             aarch64-linux-musl,
