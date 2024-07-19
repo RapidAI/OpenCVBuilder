@@ -23,11 +23,12 @@ jobs:
     runs-on: macos-${{ matrix.list.os_ver }}
 
     env:
+      BUILD_SCRIPT: build-opencv3-mac.sh
+      BUILD_OPTIONS: opencv3_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-${{ matrix.arch }}
       JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-macos-${{ matrix.list.os_ver }}-${{ matrix.arch }}-java
 
     steps:
-      # Setup JDK
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -63,27 +64,27 @@ jobs:
       # 复制
       - name: copy
         run: |
-          cp build-opencv3-mac.sh opencv-${{ matrix.ver.cv }}
-          cp build-opencv3-mac-java.sh opencv-${{ matrix.ver.cv }}
-          cp opencv3_cmake_options.txt opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_OPTIONS }} opencv-${{ matrix.ver.cv }}
 
       # 编译
       - name: build
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv3-mac.sh &&./build-opencv3-mac.sh "${{ matrix.arch }}"
+          chmod a+x ${{ env.BUILD_SCRIPT }} &&./${{ env.BUILD_SCRIPT }} -n '${{ matrix.arch }}'
 
       # 7z压缩
       - name: 7zip
         run: |
           cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install macos
           7z a ${{ env.PKG_NAME }}.7z macos
+          rm -r -f macos
 
       # 编译
       - name: build java
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          chmod a+x build-opencv3-mac-java.sh &&./build-opencv3-mac-java.sh "${{ matrix.arch }}"
+          chmod a+x ${{ env.BUILD_SCRIPT }} &&./${{ env.BUILD_SCRIPT }} -n '${{ matrix.arch }}' -j
 
       # 7z压缩
       - name: 7zip
