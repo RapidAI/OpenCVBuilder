@@ -75,16 +75,19 @@ jobs:
         run: |
           wget https://github.com/benjaminwan/CmakeBuilder/releases/download/${{ matrix.ver.cmake }}/cmake-${{ matrix.ver.cmake }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}.7z -O cmake-${{ matrix.ver.cmake }}.7z
           7z x cmake-${{ matrix.ver.cmake }}.7z -aoa
+          rm cmake-${{ matrix.ver.cmake }}.7z
 
       - name: deploy python
         run: |
           wget https://github.com/benjaminwan/PythonBuilder/releases/download/${{ matrix.ver.python }}/python-${{ matrix.ver.python }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}.7z -O python-${{ matrix.ver.python }}.7z
           7z x python-${{ matrix.ver.python }}.7z -aoa
+          rm python-${{ matrix.ver.python }}.7z
 
       - name: deploy ant
         run: |
           wget https://dlcdn.apache.org/ant/binaries/apache-ant-${{ matrix.ver.ant }}-bin.tar.gz -O apache-ant-${{ matrix.ver.ant }}.tar.gz
           tar -xf apache-ant-${{ matrix.ver.ant }}.tar.gz
+          rm apache-ant-${{ matrix.ver.ant }}.tar.gz
 
       - name: Host - Create Docker template env file
         run: |

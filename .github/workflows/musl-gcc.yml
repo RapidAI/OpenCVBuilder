@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  linux-musl:
+  musl-cross-build:
     runs-on: ubuntu-22.04
 
     strategy:
@@ -12,7 +12,7 @@ jobs:
       matrix:
         ver:
           - { cv: 3.4.17, musl: 11.4.0 }
-        target:
+        arch:
           [
             aarch64-linux-musl,
             aarch64_be-linux-musl,
@@ -72,16 +72,16 @@ jobs:
             loongarch64-linux-musl,
           ]
         exclude:
-          - target: loongarch64-linux-musl
-          - target: sh2-linux-muslfdpic
-          - target: sh2eb-linux-muslfdpic
+          - arch: loongarch64-linux-musl
+          - arch: sh2-linux-muslfdpic
+          - arch: sh2eb-linux-muslfdpic
 
-    name: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
+    name: opencv-${{ matrix.ver.cv }}-${{ matrix.arch }}
 
     env:
       BUILD_SCRIPT: build-opencv3-musl-gcc.sh
       BUILD_OPTIONS: opencv3_cmake_options.txt
-      PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.arch }}
 
     steps:
       # 检出代码
@@ -90,10 +90,10 @@ jobs:
       # 部署musl
       - name: deploy musl gcc
         run: |
-          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.target }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.target }}.7z
-          7z x ${{ matrix.target }}.7z -aoa
-          mv ${{ matrix.target }}/ /opt/
-          echo "/opt/${{ matrix.target }}" >> $GITHUB_PATH
+          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.arch }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.arch }}.7z
+          7z x ${{ matrix.arch }}.7z -aoa
+          mv ${{ matrix.arch }}/ /opt/
+          echo "/opt/${{ matrix.arch }}" >> $GITHUB_PATH
 
       # 检出opencv
       - name: checkout opencv
@@ -117,12 +117,12 @@ jobs:
         run: |
           cd opencv-${{ matrix.ver.cv }}
           chmod a+x ${{ env.BUILD_SCRIPT }}
-          ./${{ env.BUILD_SCRIPT }} -n '${{ matrix.target }}' -p '/opt/${{ matrix.target }}'
+          ./${{ env.BUILD_SCRIPT }} -n '${{ matrix.arch }}' -p '/opt/${{ matrix.arch }}'
 
       # 7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.target }}/install linux
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install linux
           7z a ${{ env.PKG_NAME }}.7z linux
           rm -r -f linux
 
