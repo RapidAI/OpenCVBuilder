@@ -75,6 +75,8 @@ jobs:
           - target: loongarch64-linux-musl
           - target: sh2-linux-muslfdpic
           - target: sh2eb-linux-muslfdpic
+          - target: powerpcle-linux-musl
+          - target: powerpcle-linux-muslsf
 
     name: opencv-${{ matrix.ver.cv }}-${{ matrix.target }}
 
