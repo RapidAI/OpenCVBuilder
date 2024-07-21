@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 3.4.17, zig: zig-linux-x86_64-0.13.0 }
+          - { cv: 3.4.18, zig: zig-linux-x86_64-0.13.0 }
         target:
           [
             aarch64_be-linux-musl,

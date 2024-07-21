@@ -90,12 +90,14 @@ $genArgs += ('-DCMAKE_SYSTEM_NAME=Windows');
 $genArgs += ('-DCMAKE_BUILD_TYPE={0}' -f $BuildType);
 $genArgs += ('-DCMAKE_CONFIGURATION_TYPES={0}' -f $BuildType);
 
-if (!(Test-Path -Path opencv3_cmake_options.txt -PathType leaf))
+$OptionsFile = "opencv3_cmake_options.txt"
+
+if (!(Test-Path -Path $OptionsFile -PathType leaf))
 {
-    Write-Host "Error: Can't find file opencv3_cmake_options.txt"
+    Write-Host "Error: Can't find file $OptionsFile"
     exit
 }
-Get-Content "opencv3_cmake_options.txt" | ForEach-Object { $genArgs += ("$_") }
+Get-Content "$OptionsFile" | ForEach-Object { $genArgs += ("$_") }
 
 if (($VsArch -eq "arm64") -and ($VsArch -eq "arm64ec"))
 {

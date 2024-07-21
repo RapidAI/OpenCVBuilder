@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 3.4.17, ndk: 25.2.9519653 }
+          - { cv: 3.4.18, ndk: 25.2.9519653 }
 
     env:
       BUILD_SCRIPT: build-opencv3-android.sh

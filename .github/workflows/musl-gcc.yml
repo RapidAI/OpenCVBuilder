@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 3.4.17, musl: 11.4.0 }
+          - { cv: 3.4.18, musl: 11.4.0 }
         arch:
           [
             aarch64-linux-musl,
@@ -75,6 +75,8 @@ jobs:
           - arch: loongarch64-linux-musl
           - arch: sh2-linux-muslfdpic
           - arch: sh2eb-linux-muslfdpic
+          - arch: powerpcle-linux-musl
+          - arch: powerpcle-linux-muslsf
 
     name: opencv-${{ matrix.ver.cv }}-${{ matrix.arch }}
 
