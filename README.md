@@ -72,4 +72,4 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 ## 其它说明
 
-- 从4.9.0开始修改WITH_OPENCL=ON
+- 4.9.0 Windows WITH_OPENCL=ON, for opencv-rust

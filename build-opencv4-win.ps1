@@ -120,6 +120,8 @@ if ($BuildJava)
     $genArgs += ('-DBUILD_opencv_java=ON');
     $genArgs += ('-DBUILD_opencv_flann=ON');
 }
+#for opencv-rust
+$genArgs += ('-DWITH_OPENCL=ON');
 
 $OutPutPath = "build-$VsArch-$VsVer-$VsCRT"
 
