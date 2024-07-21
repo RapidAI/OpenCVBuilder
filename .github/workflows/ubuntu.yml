@@ -5,7 +5,7 @@ on:
 
 jobs:
   ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-2204
 
     strategy:
       fail-fast: false
