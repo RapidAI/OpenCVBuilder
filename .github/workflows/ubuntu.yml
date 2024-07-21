@@ -5,7 +5,7 @@ on:
 
 jobs:
   ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-2204
 
     strategy:
       fail-fast: false
@@ -135,7 +135,7 @@ jobs:
 
       - name: 7zip java
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/OpenCV/java ${{ env.JAVA_PKG_NAME }}
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact
