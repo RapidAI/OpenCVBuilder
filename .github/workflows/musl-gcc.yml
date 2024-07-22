@@ -72,7 +72,6 @@ jobs:
             loongarch64-linux-musl,
           ]
         exclude:
-          - arch: loongarch64-linux-musl
           - arch: sh2-linux-muslfdpic
           - arch: sh2eb-linux-muslfdpic
           - arch: powerpcle-linux-musl
