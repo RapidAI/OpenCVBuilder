@@ -15,6 +15,12 @@ jobs:
           - { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
           - { win_ver: 2019, vs_name: vs2019, vs_ver: v142 }
           - { win_ver: 2022, vs_name: vs2022, vs_ver: v143 }
+        arch:
+          [
+            x64,
+            x86,
+            arm64,
+          ]
         crt:
           [
             md,
@@ -22,16 +28,20 @@ jobs:
           ]
         exclude:
           - list: { win_ver: 2022, vs_name: vs2022, vs_ver: v143 }
+          - list: { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
+            arch: arm64
+          - list: { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
+            arch: arm64
 
     runs-on: windows-${{ matrix.list.win_ver }}
 
-    name: windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
+    name: windows-${{ matrix.list.vs_name }}-${{ matrix.arch }}-${{ matrix.crt }}
 
     env:
       BUILD_SCRIPT: build-opencv4-win.ps1
       BUILD_OPTIONS: opencv4_cmake_options.txt
-      PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.crt }}
-      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.crt }}
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.arch }}-${{ matrix.crt }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.arch }}-${{ matrix.crt }}
 
     steps:
       # Setup JDK
@@ -70,81 +80,30 @@ jobs:
       # 编译
       # https://github.com/ilammy/msvc-dev-cmd
       #- uses: ilammy/msvc-dev-cmd@v1
-      - name: build x64
-        shell: powershell
-        run: |
-          cd opencv-${{ matrix.ver.cv }}
-          .\${{ env.BUILD_SCRIPT }} -VsArch x64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} 
 
-      - name: build x86
+      - name: build
         shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          .\${{ env.BUILD_SCRIPT }} -VsArch x86 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }}
-
-      - name: build arm64
-        if: ${{ (matrix.list.vs_name == 'vs2019') || (matrix.list.vs_name == 'vs2022') }}
-        shell: powershell
-        run: |
-          cd opencv-${{ matrix.ver.cv }}
-          .\${{ env.BUILD_SCRIPT }} -VsArch arm64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} 
+          .\${{ env.BUILD_SCRIPT }} -VsArch ${{ matrix.arch }} -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} 
 
       - name: 7zip libs
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x64
-          cp -r opencv-${{ matrix.ver.cv }}/build-x86-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-x86
-          if ( ("${{ matrix.list.vs_name }}" -eq "VS2019") -or ("${{ matrix.list.vs_name }}" -eq "VS2022") )
-          {
-            echo "vs2019 or vs2022 7z x64 x86 arm64"
-            cp -r opencv-${{ matrix.ver.cv }}/build-arm64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install windows-arm64
-            7z a ${{ env.PKG_NAME }}.7z windows-x64 windows-x86 windows-arm64
-            rm windows-arm64 -r -fo
-          }
-          else
-          {
-            echo "vs2015 or vs2017 7z x64 x86"
-            7z a ${{ env.PKG_NAME }}.7z windows-x64 windows-x86            
-          }
-          rm windows-x64 -r -fo
-          rm windows-x86 -r -fo
+          cp -r opencv-${{ matrix.ver.cv }}/build-${{ matrix.arch }}-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install ${{ env.PKG_NAME }}
+          7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
+          rm ${{ env.PKG_NAME }} -r -fo
 
-      - name: build java x64
+      - name: build java
         shell: powershell
         run: |
           cd opencv-${{ matrix.ver.cv }}
-          .\${{ env.BUILD_SCRIPT }} -VsArch x64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
-
-      - name: build java x86
-        shell: powershell
-        run: |
-          cd opencv-${{ matrix.ver.cv }}
-          .\${{ env.BUILD_SCRIPT }} -VsArch x86 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
-
-      - name: build java arm64
-        if: ${{ (matrix.list.vs_name == 'vs2019') || (matrix.list.vs_name == 'vs2022') }}
-        shell: powershell
-        run: |
-          cd opencv-${{ matrix.ver.cv }}
-          .\${{ env.BUILD_SCRIPT }} -VsArch arm64 -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
+          .\${{ env.BUILD_SCRIPT }} -VsArch ${{ matrix.arch }} -VsVer ${{ matrix.list.vs_ver }} -VsCRT ${{ matrix.crt }} -BuildJava
 
       - name: 7zip java
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-x64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x64
-          cp -r opencv-${{ matrix.ver.cv }}/build-x86-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-x86
-          if ( ("${{ matrix.list.vs_name }}" -eq "VS2019") -or ("${{ matrix.list.vs_name }}" -eq "VS2022") )
-          {
-            echo "vs2019 or vs2022 7z x64 x86 arm64"
-            cp -r opencv-${{ matrix.ver.cv }}/build-arm64-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java windows-arm64
-            7z a ${{ env.JAVA_PKG_NAME }}.7z windows-x64 windows-x86 windows-arm64
-            rm windows-arm64 -r -fo
-          }
-          else
-          {
-            echo "vs2015 or vs2017 7z x64 x86"
-            7z a ${{ env.JAVA_PKG_NAME }}.7z windows-x64 windows-x86    
-          }
-          rm windows-x64 -r -fo
-          rm windows-x86 -r -fo
+          cp -r opencv-${{ matrix.ver.cv }}/build-${{ matrix.arch }}-${{ matrix.list.vs_ver }}-${{ matrix.crt }}/install/java ${{ env.JAVA_PKG_NAME }}
+          7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
+          rm ${{ env.JAVA_PKG_NAME }} -r -fo
 
       # 上传artifact
       - name: upload lib
