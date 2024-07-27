@@ -99,7 +99,7 @@ if (!(Test-Path -Path $OptionsFile -PathType leaf))
 }
 Get-Content "$OptionsFile" | ForEach-Object { $genArgs += ("$_") }
 
-if (($VsArch -eq "arm64") -and ($VsArch -eq "arm64ec"))
+if (($VsArch -eq "arm64") -or ($VsArch -eq "arm64ec"))
 {
     $genArgs += ('-DCV_ENABLE_INTRINSICS=OFF');
 }
