@@ -41,7 +41,7 @@ jobs:
       BUILD_SCRIPT: build-opencv4-win.ps1
       BUILD_OPTIONS: opencv4_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.arch }}-${{ matrix.crt }}
-      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-java-${{ matrix.arch }}-${{ matrix.crt }}
+      JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-windows-${{ matrix.list.vs_name }}-${{ matrix.arch }}-${{ matrix.crt }}-java
 
     steps:
       # Setup JDK
