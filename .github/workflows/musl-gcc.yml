@@ -83,6 +83,7 @@ jobs:
       BUILD_SCRIPT: build-opencv3-musl-gcc.sh
       BUILD_OPTIONS: opencv3_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-${{ matrix.arch }}
+      MUSL_NAME: ${{ matrix.arch }}-${{ matrix.ver.musl }}
 
     steps:
       # 检出代码
@@ -91,7 +92,7 @@ jobs:
       # 部署musl
       - name: deploy musl gcc
         run: |
-          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ matrix.arch }}-${{ matrix.ver.musl }}.7z -O ${{ matrix.arch }}.7z
+          wget https://github.com/benjaminwan/musl-cross-builder/releases/download/${{ matrix.ver.musl }}/${{ env.MUSL_NAME }}.7z -O ${{ matrix.arch }}.7z
           7z x ${{ matrix.arch }}.7z -aoa
           mv ${{ matrix.arch }}/ /opt/
           echo "/opt/${{ matrix.arch }}" >> $GITHUB_PATH
@@ -123,9 +124,9 @@ jobs:
       # 7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install linux
-          7z a ${{ env.PKG_NAME }}.7z linux
-          rm -r -f linux
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install ${{ env.PKG_NAME }}
+          7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
+          rm -r -f ${{ env.PKG_NAME }}
 
       # 上传artifact
 #      - name: upload

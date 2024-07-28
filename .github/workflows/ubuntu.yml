@@ -5,7 +5,7 @@ on:
 
 jobs:
   ubuntu:
-    runs-on: ubuntu-2204
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
@@ -42,6 +42,10 @@ jobs:
       BUILD_OPTIONS: opencv3_cmake_options.txt
       PKG_NAME: opencv-${{ matrix.ver.cv }}-ubuntu-${{ matrix.list.os_ver }}-${{ matrix.arch }}
       JAVA_PKG_NAME: opencv-${{ matrix.ver.cv }}-ubuntu-${{ matrix.list.os_ver }}-${{ matrix.arch }}-java
+      CMAKE_NAME: cmake-${{ matrix.ver.cmake }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}
+      PYTHON_NAME: python-${{ matrix.ver.python }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}
+      ANT_NAME: apache-ant-${{ matrix.ver.ant }}-bin
+
 
     steps:
       # 检出代码
@@ -73,21 +77,21 @@ jobs:
 
       - name: deploy cmake
         run: |
-          wget https://github.com/benjaminwan/CmakeBuilder/releases/download/${{ matrix.ver.cmake }}/cmake-${{ matrix.ver.cmake }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}.7z -O cmake-${{ matrix.ver.cmake }}.7z
-          7z x cmake-${{ matrix.ver.cmake }}.7z -aoa
-          rm cmake-${{ matrix.ver.cmake }}.7z
+          wget https://github.com/benjaminwan/CmakeBuilder/releases/download/${{ matrix.ver.cmake }}/${{ env.CMAKE_NAME }}.7z -O ${{ env.CMAKE_NAME }}.7z
+          7z x ${{ env.CMAKE_NAME }}.7z -aoa
+          rm ${{ env.CMAKE_NAME }}.7z
 
       - name: deploy python
         run: |
-          wget https://github.com/benjaminwan/PythonBuilder/releases/download/${{ matrix.ver.python }}/python-${{ matrix.ver.python }}-${{ matrix.os_name }}-${{ matrix.list.os_ver }}-${{ matrix.arch }}.7z -O python-${{ matrix.ver.python }}.7z
-          7z x python-${{ matrix.ver.python }}.7z -aoa
-          rm python-${{ matrix.ver.python }}.7z
+          wget https://github.com/benjaminwan/PythonBuilder/releases/download/${{ matrix.ver.python }}/${{ env.PYTHON_NAME }}.7z -O ${{ env.PYTHON_NAME }}.7z
+          7z x ${{ env.PYTHON_NAME }}.7z -aoa
+          rm ${{ env.PYTHON_NAME }}.7z
 
       - name: deploy ant
         run: |
-          wget https://dlcdn.apache.org/ant/binaries/apache-ant-${{ matrix.ver.ant }}-bin.tar.gz -O apache-ant-${{ matrix.ver.ant }}.tar.gz
-          tar -xf apache-ant-${{ matrix.ver.ant }}.tar.gz
-          rm apache-ant-${{ matrix.ver.ant }}.tar.gz
+          wget https://dlcdn.apache.org/ant/binaries/${{ env.ANT_NAME }}.tar.gz -O ${{ env.ANT_NAME }}.tar.gz
+          tar -xf ${{ env.ANT_NAME }}.tar.gz
+          rm ${{ env.ANT_NAME }}.tar.gz
 
       - name: Host - Create Docker template env file
         run: |
@@ -124,9 +128,9 @@ jobs:
       # install文件夹改名linux，并使用7z压缩
       - name: 7zip
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install linux
-          7z a ${{ env.PKG_NAME }}.7z linux
-          rm -r -f linux
+          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install ${{ env.PKG_NAME }}
+          7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
+          rm -r -f ${{ env.PKG_NAME }}
 
       - name: Docker - build
         run: |
@@ -137,6 +141,7 @@ jobs:
         run: |
           cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/OpenCV/java ${{ env.JAVA_PKG_NAME }}
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
+          rm -r -f ${{ env.JAVA_PKG_NAME }}
 
       # 上传artifact
 #      - name: upload
