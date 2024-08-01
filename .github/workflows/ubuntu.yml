@@ -12,7 +12,7 @@ jobs:
       matrix:
         os_name: [ubuntu]
         ver:
-          - { cv: 4.9.0, cmake: 3.28.6, python: 3.8.19, ant: 1.10.14, jdk: openjdk-8-jdk }
+          - { cv: 4.10.0, cmake: 3.28.6, python: 3.8.19, ant: 1.10.14, jdk: openjdk-8-jdk }
         list:
           - { os_ver: 14.04, os_id: trusty }
           - { os_ver: 16.04, os_id: xenial }

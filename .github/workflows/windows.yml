@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.9.0, jdk: 8, ant: 1.10.14 }
+          - { cv: 4.10.0, jdk: 8, ant: 1.10.14 }
         list:
           - { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
           - { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
@@ -27,7 +27,6 @@ jobs:
             mt,
           ]
         exclude:
-          - list: { win_ver: 2022, vs_name: vs2022, vs_ver: v143 }
           - list: { win_ver: 2019, vs_name: vs2015, vs_ver: v140 }
             arch: arm64
           - list: { win_ver: 2019, vs_name: vs2017, vs_ver: v141 }
