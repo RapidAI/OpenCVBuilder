@@ -70,6 +70,10 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 - github action 已不支持低版本macos runner
 
+### 如果7z包解压出错
+- 需要安装最新版的7zip工具，https://www.7-zip.org/download.html
+
 ## 其它说明
 
 - 4.9.0 Windows WITH_OPENCL=ON, for opencv-rust
+- 4.10.0开始提高了对gcc版本的要求，故缺少某些平台的包
