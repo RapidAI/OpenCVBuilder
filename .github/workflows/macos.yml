@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         ver:
-          - { cv: 4.10.0, ant: 1.10.14 }
+          - { cv: 4.11.0, ant: 1.10.14 }
         list:
           - { os_ver: 12, java: 8 }
           - { os_ver: 13, java: 8 }

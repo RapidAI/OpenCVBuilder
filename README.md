@@ -77,3 +77,4 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 - 4.9.0 Windows WITH_OPENCL=ON, for opencv-rust
 - 4.10.0开始提高了对gcc版本的要求，故缺少某些平台的包
+- 4.11.0支持JPEGXL，IMGCODEC_GIF
