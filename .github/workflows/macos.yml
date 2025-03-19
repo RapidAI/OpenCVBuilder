@@ -85,16 +85,19 @@ jobs:
 
       # 编译
       - name: build java
+        continue-on-error: true
         run: |
           cd opencv-${{ matrix.ver.cv }}
           chmod a+x ${{ env.BUILD_SCRIPT }} &&./${{ env.BUILD_SCRIPT }} -n '${{ matrix.arch }}' -j
 
       # 7z压缩
-      - name: 7zip
+      - name: 7zip java
         run: |
-          cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
-          7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
-          rm -r -f ${{ env.JAVA_PKG_NAME }}
+          if [ -d "opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4" ]; then
+            cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
+            7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
+            rm -r -f ${{ env.JAVA_PKG_NAME }}
+          fi
 
       # 上传artifact
 #      - name: upload

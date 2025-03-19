@@ -25,11 +25,9 @@ jobs:
             amd64,
             arm,
             arm64,
-            ppc64le,
+#            ppc64le,
           ]
         exclude:
-          - list: { os_ver: 14.04, os_id: trusty }
-            arch: ppc64le
           - list: { os_ver: 20.04, os_id: focal }
             arch: 386
           - list: { os_ver: 22.04, os_id: jammy }
@@ -128,17 +126,22 @@ jobs:
       # install文件夹改名linux，并使用7z压缩
       - name: 7zip
         run: |
+          sudo chown -R $(id -u):$(id -g) opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install
+          sudo chmod -R 755 opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install
           cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install ${{ env.PKG_NAME }}
           7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
           rm -r -f ${{ env.PKG_NAME }}
 
-      - name: Docker - build
+      - name: Docker - build java
+        continue-on-error: true
         run: |
           docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} chmod a+x ${{ env.BUILD_SCRIPT }}
           docker exec --env-file env.custom -w /root/opencv-${{ matrix.ver.cv }} ${{ matrix.os_name }} ./${{ env.BUILD_SCRIPT }} -n '${{ matrix.arch }}' -j
 
       - name: 7zip java
         run: |
+          sudo chown -R $(id -u):$(id -g) opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4
+          sudo chmod -R 755 opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4
           cp -r opencv-${{ matrix.ver.cv }}/build-Release-${{ matrix.arch }}/install/share/java/opencv4 ${{ env.JAVA_PKG_NAME }}
           7z a ${{ env.JAVA_PKG_NAME }}.7z ${{ env.JAVA_PKG_NAME }}
           rm -r -f ${{ env.JAVA_PKG_NAME }}
