@@ -103,5 +103,4 @@ MSVC v143 - VS 2022 C++ x64/x86 生成工具(最新)
 
 - 4.9.0 Windows WITH_OPENCL=ON, for opencv-rust
 - 4.10.0开始提高了对gcc版本的要求，故缺少某些平台的包
-- 4.11.0支持JPEGXL，IMGCODEC_GIF，但JPEGXL可能会导致java在某些系统下编译出错，故部分系统缺少java版
 - 4.11.0取消ppc64le版本
