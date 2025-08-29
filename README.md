@@ -70,6 +70,34 @@ OpenCV在OCR中只是做图像的读取保存、编解码、缩放等，可以�
 
 - github action 已不支持低版本macos runner
 
+### 如果7z包解压出错
+
+- 需要安装最新版的7zip工具，https://www.7-zip.org/download.html
+
+### 关于Visual Studio 2022 MSVC编译器安装
+
+- 删除旧版:```C:\Program Files (x86)\Microsoft Visual Studio\Installer\InstallCleanup.exe```
+- https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history
+- 下载LTSC 17.12或选择以下链接
+- https://aka.ms/vs/17/release.LTSC.17.12/vs_professional.exe
+- https://aka.ms/vs/17/release.LTSC.17.12/vs_enterprise.exe
+- 勾选: "使用 C++ 的桌面开发"
+- 在"SDK、库和框架"中勾选：
+
+```
+适用于最新v143生成工具的C++ATL(ARM)
+适用于最新v143生成工具的C++ATL(ARM64/ARM64EC)
+适用于最新v143生成工具的C++ATL(x86和x64)
+```
+
+- 在"编译器、生成工具和运行时"中勾选：
+
+```
+MSVC v143 - VS 2022 C++ ARM 生成工具(最新)
+MSVC v143 - VS 2022 C++ ARM64/ARM64EC 生成工具(最新)
+MSVC v143 - VS 2022 C++ x64/x86 生成工具(最新)
+```
+
 ## 其它说明
 
 - 4.9.0 Windows WITH_OPENCL=ON, for opencv-rust
