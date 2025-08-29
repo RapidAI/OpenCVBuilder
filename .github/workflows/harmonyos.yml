@@ -1,4 +1,4 @@
-name: harmonyOS
+name: HarmonyOS
 
 on:
   workflow_dispatch:
