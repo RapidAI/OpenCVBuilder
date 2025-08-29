@@ -1,0 +1,103 @@
+name: HarmonyOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ohos:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ver:
+          - { cv: 4.10.0, sdk: 4.1.4, ndk: 4.1.10.5 }
+          - { cv: 4.10.0, sdk: 5.1.0, ndk: 5.1.0.107 }
+
+    env:
+      BUILD_SCRIPT: build-opencv4-ohos.sh
+      BUILD_OPTIONS: opencv4_cmake_options.txt
+      OHOS_NDK: /opt/native
+      PKG_NAME: opencv-${{ matrix.ver.cv }}-ohos-${{ matrix.ver.sdk }}
+
+    steps:
+      # 下载并解压ohos ndk
+      - name: deploy ohos ndk
+        run: |
+          wget https://repo.huaweicloud.com/harmonyos/os/${{ matrix.ver.sdk }}-Release/ohos-sdk-windows_linux-public.tar.gz
+          tar -xf ohos-sdk-windows_linux-public.tar.gz
+          cd ohos-sdk/linux
+          unzip -q native-linux-x64-${{ matrix.ver.ndk }}-Release.zip
+          mv native/ /opt/
+          echo "/opt/native" >> $GITHUB_PATH
+
+      # 检出代码
+      - uses: actions/checkout@v5
+
+      # 检出opencv
+      - name: checkout opencv
+        uses: actions/checkout@v5
+        with:
+          repository: opencv/opencv
+          path: opencv-${{ matrix.ver.cv }}
+          ref: ${{ matrix.ver.cv }}
+          submodules: recursive
+
+      # 复制
+      - name: copy build script
+        run: |
+          cp ${{ env.BUILD_SCRIPT }} opencv-${{ matrix.ver.cv }}
+          cp ${{ env.BUILD_OPTIONS }} opencv-${{ matrix.ver.cv }}
+
+      # 编译
+      - name: build
+        run: |
+          cd opencv-${{ matrix.ver.cv }}
+          chmod a+x ${{ env.BUILD_SCRIPT }}
+          ./${{ env.BUILD_SCRIPT }} ${{ env.OHOS_NDK }}
+
+      # 压缩
+      - name: 7zip
+        run: |
+          mv opencv-${{ matrix.ver.cv }}/opencv-ohos ${{ env.PKG_NAME }}
+          7z a ${{ env.PKG_NAME }}.7z ${{ env.PKG_NAME }}
+
+      # 上传artifact
+#      - name: upload
+#        uses: actions/upload-artifact@v5
+#        with:
+#          name: ${{ env.PKG_NAME }}
+#          path: ${{ env.PKG_NAME }}.7z
+
+      # 获取所有的git log和tag
+#      - name: Unshallow
+#        run: git fetch --prune --unshallow
+
+      # 获取git log 从 previousTag 到 lastTag
+#      - name: Get git log
+#        id: git-log
+#        run: |
+#          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+#          lastTag=$(git describe --abbrev=0 --tags)
+#          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+#          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+#          echo "$log"
+#          echo "log_state="$log"" >> $GITHUB_ENV
+
+      # 创建Changelog文件 triggered by git tag push
+#      - name: Generate Changelog
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          echo -e '${{ env.log_state }}' > release.md
+
+      # 创建release 上传release
+      # https://github.com/marketplace/actions/create-release
+      - name: Create release and upload-archive
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: false
+          bodyFile: release.md
+          artifacts: ${{ env.PKG_NAME }}.7z
+          allowUpdates: true
+          artifactContentType: application/x-7z-compressed
+          token: ${{ secrets.GITHUB_TOKEN }}
