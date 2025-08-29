@@ -17,18 +17,19 @@ jobs:
     env:
       BUILD_SCRIPT: build-opencv4-ohos.sh
       BUILD_OPTIONS: opencv4_cmake_options.txt
-      OHOS_NDK: $GITHUB_WORKSPACE/ohos-sdk/linux/native
+      OHOS_NDK: /opt/native
       PKG_NAME: opencv-${{ matrix.ver.cv }}-ohos-${{ matrix.ver.sdk }}
 
     steps:
       # 下载并解压ohos ndk
-      - uses: actions/checkout@v5
       - name: deploy ohos ndk
         run: |
           wget https://repo.huaweicloud.com/harmonyos/os/${{ matrix.ver.sdk }}-Release/ohos-sdk-windows_linux-public.tar.gz
           tar -xf ohos-sdk-windows_linux-public.tar.gz
           cd ohos-sdk/linux
           unzip -q native-linux-x64-${{ matrix.ver.ndk }}-Release.zip
+          mv native/ /opt/
+          echo "/opt/native" >> $GITHUB_PATH
 
       # 检出代码
       - uses: actions/checkout@v5
